@@ -1,29 +1,4 @@
 #!/usr/bin/env python3
-"""
-COSC726 - Agentic Artificial Intelligence
-Week 1 / Lab 0 - Deterministic support-agent trace (STUDENT VERSION)
-
-This program is a trace SIMULATOR, not a live AI agent. Every event is
-pre-recorded and deterministic, so you can study control flow without a model,
-an API key, an internet connection, or a paid account.
-
-The DECIDE entries are concise authored rationale summaries written for teaching
-and audit. They are NOT a claim that a model's private reasoning was exposed.
-
-Running example: the customer-support agent helping Layla with order #A1032.
-It follows the module all term, gaining one capability each week.
-
-Usage (local terminal):
-    python COSC726_W01_hello_agent_mock.py --self-test
-    python COSC726_W01_hello_agent_mock.py --mock
-    python COSC726_W01_hello_agent_mock.py --mock --fast --upto 4
-    python COSC726_W01_hello_agent_mock.py --check
-    python COSC726_W01_hello_agent_mock.py --json
-
-Usage (Google Colab - prefix with an exclamation mark):
-    !python COSC726_W01_hello_agent_mock.py --self-test
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -160,7 +135,7 @@ def play_trace(*, fast: bool = False, upto: int | None = None) -> None:
     events = MOCK_TRACE if upto is None else MOCK_TRACE[:upto]
     width = max(len(event.kind) for event in MOCK_TRACE)
     print("=" * 100)
-    print(" COSC726 Week 1 - DETERMINISTIC MOCK TRACE - no model / no API")
+    print(" COSC726 Week 1 - DETERMINISTIC MOCK TRACE ")
     print("=" * 100)
     for event in events:
         print(f"[{event.kind:<{width}}] step {event.step:>2}: {event.text}")
