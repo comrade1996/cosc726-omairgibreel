@@ -1,7 +1,6 @@
 # COSC726 - Agentic Artificial Intelligence
 
-Weekly coursework repository for Omair Gibreel. Each week is self-contained in
-its own folder so a marker can clone this repository and reproduce the work.
+Weekly coursework repository for Omair Gibreel. 
 
 ## Repository structure
 
@@ -18,7 +17,6 @@ cosc726-omairgibreel/
 `-- requirements.txt
 ```
 
-Future assignments will use `week02/`, `week03/`, and so on.
 
 ## Setup
 
@@ -46,17 +44,4 @@ Then install the repository requirements:
 python -m pip install -r requirements.txt
 ```
 
-## Weekly assignments
 
-| Week | Assignment | Status | Instructions |
-|---|---|---|---|
-| 01 | Lab 0 - Engineering Baseline & Trace Literacy | Complete | [`week01/README.md`](week01/README.md) |
-
-## Quick verification
-
-```bash
-python week01/COSC726_W01_hello_agent_mock.py --self-test
-python week01/COSC726_W01_hello_agent_mock.py --check
-```
-
-Both commands must pass; the annotation checker must report `12/12`.
