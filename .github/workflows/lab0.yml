@@ -1,0 +1,18 @@
+name: Lab 0 checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-lab0:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Trace integrity self-test
+        run: python week01/COSC726_W01_hello_agent_mock.py --self-test
+      - name: Annotation check
+        run: python week01/COSC726_W01_hello_agent_mock.py --check
