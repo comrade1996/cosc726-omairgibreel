@@ -1,53 +1,36 @@
-# Week 01 - Lab 0
+# Week 1 - Lab 0
 
-## Engineering Baseline & Trace Literacy
+This is my first practical assignment for COSC726. The main aim was to make
+sure my Python and Git setup works and to learn how to read an agent trace.
 
-This assignment verifies the Python/Git environment and demonstrates how to
-classify and audit a deterministic agent trace. It requires no API key, model,
-network service, or paid account.
+The example follows a support agent helping Layla with a delayed order. The
+agent checks the order, reads the late-delivery policy, and asks a person for
+approval before adding a credit. This is important because the credit would
+change the customer's account.
 
-## Files
+## Files in this folder
 
-- `lab0.ipynb` - executed guided notebook containing the environment checks,
-  12-step trace classification, evidence audit, PEAS analysis, and decision
-  memo.
-- `COSC726_W01_hello_agent_mock.py` - deterministic trace simulator and
-  annotation checker.
-- `requirements.txt` - Week 1 dependency declaration.
+- `lab0.ipynb` contains my written answers, trace audit, PEAS worksheet, and
+  decision memo. I ran the notebook from top to bottom and saved the outputs.
+- `COSC726_W01_hello_agent_mock.py` contains the fixed 12-step trace and my
+  sense, reason, act, and observe classifications.
+- `requirements.txt` shows that this week only uses the Python standard
+  library, so no extra packages are needed.
 
-## Requirements
+I kept the original filenames because they are the names required in the lab
+instructions.
 
-- Python 3.11 or newer
-- Git
-- A virtual environment when running locally
+## How to check my work
 
-From the repository root, install this week's requirements:
-
-```bash
-python -m pip install -r week01/requirements.txt
-```
-
-## Run and test
-
-From the repository root:
+Run these commands from the main repository folder:
 
 ```bash
 python week01/COSC726_W01_hello_agent_mock.py --self-test
 python week01/COSC726_W01_hello_agent_mock.py --check
-python week01/COSC726_W01_hello_agent_mock.py --mock --fast
 ```
 
-Expected results:
+The first command should print `TRACE SELF-TEST PASSED`. The second command
+should give a score of `12/12`.
 
-- Self-test: `TRACE SELF-TEST PASSED`
-- Annotation check: `Score: 12/12`
-
-Open `week01/lab0.ipynb` in Google Colab or Jupyter and run all cells from top
-to bottom. The final readiness cell should print `READY TO SUBMIT`.
-
-## Submission checkpoint
-
-- Notebook: `week01/lab0.ipynb`
-- Script: `week01/COSC726_W01_hello_agent_mock.py`
-- Git tag: `week-01-complete`
-- CI: the `Lab 0 checks` workflow must pass
+The notebook's final check should also show that the environment, audit, PEAS
+worksheet, and decision memo are complete.
