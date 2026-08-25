@@ -9,10 +9,12 @@
 ## Project summary
 
 I plan to build an MCP server that helps transfer a synthetic ambulance patient
-record to a receiving emergency department in HL7 FHIR format. The project will
-focus on interoperability and safety: validating the record, detecting missing
-handoff information, building a structured draft, enforcing patient-level
-authorization, and recording an audit trail.
+record to a receiving emergency department in HL7 FHIR format. The dataset will
+combine Synthea FHIR R4 patients, NEMSIS Version 3 field definitions, and
+manually generated synthetic ambulance events. The project will focus on
+interoperability and safety: validating the record, detecting missing handoff
+information, building a structured draft, enforcing patient-level authorization,
+and recording an audit trail.
 
 The system will not diagnose a patient, recommend treatment, calculate a drug
 dose, choose a destination hospital, or dispatch an ambulance. A clinician will
@@ -39,12 +41,59 @@ or emergency clinician. It asks whether an MCP server can make a narrow
 ambulance handoff workflow more interoperable, complete, and auditable while
 keeping safety decisions outside the model.
 
+## Dataset strategy
+
+The project will use three complementary data sources rather than pretending
+that one dataset contains the whole ambulance-to-hospital journey.
+
+### 1. Synthea FHIR R4 patients
+
+The starting point will be the official Synthea sample containing 100 synthetic
+patients in FHIR R4 format. A deterministic script will select 20 patients and
+copy only the resources needed by the project. Synthea provides realistic
+longitudinal structure without using real protected health information, and its
+sample data can be included in the public repository.
+
+### 2. NEMSIS field definitions
+
+The NEMSIS Version 3 data dictionary will define the shape and meaning of the
+prehospital source record. I will select a small subset covering incident and
+response times, patient demographics, vital signs, symptoms, working
+impressions, procedures, medications, disposition, transport, and destination.
+The exact NEMSIS dictionary release and selected element IDs will be recorded in
+the mapping file.
+
+NEMSIS will be used as a field-definition reference, not copied as a large
+research dataset. No raw NEMSIS patient-level research files will be committed
+or redistributed.
+
+### 3. Manually generated ambulance events
+
+I will attach 40 synthetic ambulance events to the selected Synthea patients.
+Each event will be generated from a versioned template and will contain only
+synthetic values. Twenty-eight will represent normal complete or incomplete
+handoffs. Twelve will be controlled adversarial cases such as a mismatched
+patient, missing vital-sign units, conflicting timestamps, stale record
+versions, narrative prompt injection, and duplicate handoff confirmation.
+
+Every event will have four linked artifacts:
+
+1. the selected Synthea patient resources;
+2. the NEMSIS-inspired synthetic source event;
+3. the expected FHIR R4 handoff Bundle;
+4. labels for missing fields, permitted tools, expected validation findings,
+   and expected stop condition.
+
+This design makes the data small enough for GitHub and Colab while keeping the
+mapping and safety evaluation reproducible.
+
 ## Research questions
 
 1. Can two independent MCP clients discover and use the same ambulance handoff
    capabilities without client-specific tool definitions?
-2. Can an ePCR-like ambulance record be mapped into a valid HL7 FHIR R4 Bundle
-   without losing important source fields or inventing clinical facts?
+2. Can a NEMSIS-inspired synthetic ambulance event linked to a Synthea patient
+   be mapped into a valid HL7 FHIR R4 Bundle without losing source fields or
+   inventing clinical facts?
 3. Can deterministic completeness checks identify missing handoff data more
    reliably than asking a language model to notice it?
 4. Can server-side authorization, patient matching, and clinician confirmation
@@ -54,9 +103,10 @@ keeping safety decisions outside the model.
 
 ## Proposed workflow
 
-1. A synthetic ambulance case is loaded from the evaluation dataset.
-2. A deterministic mapper creates FHIR R4 resources and a transaction or
-   document Bundle.
+1. A Synthea FHIR R4 patient and its linked synthetic ambulance event are loaded
+   from the versioned evaluation dataset.
+2. A deterministic mapper applies the documented NEMSIS-to-FHIR field map and
+   creates a FHIR R4 document Bundle.
 3. The MCP server exposes the authorized case as a resource.
 4. The client calls validation and completeness tools before requesting a
    handoff draft.
@@ -69,7 +119,7 @@ keeping safety decisions outside the model.
 
 ```mermaid
 flowchart LR
-    A[Synthetic ambulance ePCR] --> B[FHIR mapping layer]
+    A[Synthea patient plus synthetic EMS event] --> B[NEMSIS-to-FHIR mapping]
     B --> C[FHIR R4 Bundle]
     D[Agent or MCP Inspector] --> E[MCP client]
     E -->|stdio or Streamable HTTP| F[Ambulance MCP server]
@@ -164,7 +214,8 @@ the same validation and authorization even if a client ignores them.
 
 ## Evaluation dataset
 
-I will create at least 40 synthetic ambulance cases:
+I will create 40 synthetic ambulance cases linked to 20 deterministically
+selected patients from the Synthea 100-patient FHIR R4 sample:
 
 - 28 normal cases covering complete and incomplete handoffs, repeated vital
   signs, administered medications, procedures, and receiving acknowledgements;
@@ -174,8 +225,14 @@ I will create at least 40 synthetic ambulance cases:
   a missing clinical fact.
 
 Each case will have a source record, expected FHIR resources, expected missing
-fields, permitted tools, and expected stop condition. A small subset will be
-reviewed manually against the profile before it is used as an evaluation set.
+fields, permitted tools, and expected stop condition. It will also record the
+source Synthea patient ID, event-template version, selected NEMSIS field IDs,
+mapping version, and FHIR profile version. At least eight cases will be reviewed
+manually against the source-to-FHIR mapping before evaluation begins.
+
+The train/test distinction is simple because this is an integration and safety
+evaluation, not model training. Prompt examples will use separate demonstration
+cases and will never contain an evaluation event.
 
 ## Experimental comparison
 
@@ -207,11 +264,13 @@ transport, and case-set commit will be recorded beside every result.
 ## Colab and reproducibility
 
 The project will include a Google Colab notebook that installs pinned Python
-dependencies, creates the synthetic cases, starts the MCP server locally, runs
-the client, validates the FHIR Bundles, displays the evaluation table, and
-shuts the server down cleanly. A deterministic fake model client will run every
-safety test without an API key. An optional open-weight model section may be
-used only for the handoff wording, not for validation or authorization.
+dependencies, downloads or reads the pinned Synthea FHIR R4 sample, verifies its
+checksum, generates the ambulance events from versioned templates, starts the
+MCP server locally, runs the client, validates the FHIR Bundles, displays the
+evaluation table, and shuts the server down cleanly. A deterministic fake model
+client will run every safety test without an API key. An optional open-weight
+model section may be used only for handoff wording, not for validation or
+authorization.
 
 No notebook cell will depend on a path from my own computer. A fresh Colab
 runtime should be able to reproduce the deterministic results from the cloned
@@ -233,7 +292,13 @@ project/
 |   |-- validation.py
 |   |-- authorization.py
 |   `-- audit.py
-|-- data/synthetic_cases.json
+|-- data/
+|   |-- source/synthea_patients/
+|   |-- source/ambulance_events/
+|   |-- expected/fhir_bundles/
+|   `-- labels/evaluation_labels.json
+|-- mappings/nemsis_to_fhir.csv
+|-- scripts/build_dataset.py
 |-- profiles/handoff-r4.json
 |-- tests/
 `-- notebooks/ambulance_mcp_colab.ipynb
@@ -244,7 +309,7 @@ project/
 | Week | Planned result |
 |---|---|
 | 5 | Proposal, scope, safety boundaries, and research questions |
-| 6 | Synthetic ePCR schema, FHIR mapping plan, fixtures, and threat model |
+| 6 | Pin Synthea sample, select patients, define NEMSIS fields, and write the threat model |
 | 7 | FHIR mapper, validator, and deterministic tests |
 | 8 | MCP `stdio` server with tools, resources, and prompts |
 | 9 | Patient-scoped authorization, confirmation gate, and audit events |
@@ -255,7 +320,9 @@ project/
 ## Deliverables
 
 - Python MCP server implementing the ambulance handoff capabilities;
-- synthetic ambulance dataset and expected FHIR Bundles;
+- selected Synthea FHIR R4 patient subset;
+- manually generated NEMSIS-inspired ambulance events and expected FHIR Bundles;
+- versioned NEMSIS-to-FHIR mapping table and dataset-generation script;
 - FHIR mapping and validation rules;
 - two MCP clients or one client plus the MCP Inspector;
 - Colab demonstration notebook;
@@ -275,9 +342,11 @@ HTTP demonstration will stay local. If a real model is slow or unreliable, the
 deterministic client will still demonstrate all protocol, validation,
 authorization, and audit requirements.
 
-The NEMSIS standard may be used as a reference for prehospital field names, but
-full NEMSIS certification and a complete NEMSIS-to-FHIR implementation are out
-of scope. The project will publish a small, explicit mapping table instead.
+The NEMSIS standard will be used as a reference for prehospital field names,
+but full NEMSIS certification and a complete NEMSIS-to-FHIR implementation are
+out of scope. The project will publish a small, explicit mapping table instead.
+If the Synthea download changes, the build script will fail its checksum check
+instead of silently creating a different dataset.
 
 ## Success criteria
 
@@ -291,6 +360,7 @@ measures what MCP and FHIR added instead of only showing that the server starts.
 
 ## References
 
+- [Synthea FHIR R4 sample downloads](https://synthea.mitre.org/downloads)
 - [HL7 FHIR R4 specification](https://hl7.org/fhir/R4/)
 - [FHIR Patient resource](https://hl7.org/fhir/R4/patient.html)
 - [FHIR Observation resource](https://hl7.org/fhir/R4/observation.html)
@@ -300,6 +370,7 @@ measures what MCP and FHIR added instead of only showing that the server starts.
 - [FHIR AuditEvent resource](https://hl7.org/fhir/R4/auditevent.html)
 - [SMART App Launch authorization guide](https://hl7.org/fhir/smart-app-launch/)
 - [NEMSIS Version 3 technical resources](https://nemsis.org/technical-resources/version-3/)
+- [NEMSIS Version 3 data dictionaries](https://nemsis.org/technical-resources/version-3/version-3-data-dictionaries/)
 - [Model Context Protocol specification](https://modelcontextprotocol.io/specification/latest)
 - [Official MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [MCP security best practices](https://modelcontextprotocol.io/specification/latest/basic/security_best_practices)

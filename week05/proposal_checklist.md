@@ -7,6 +7,10 @@
 - [x] Scope includes MCP tools, resources, prompts, and two transports.
 - [x] Sending a handoff requires explicit clinician confirmation.
 - [x] Synthetic patient data avoids exposing protected health information.
+- [x] Synthea FHIR R4 is the documented patient-data source.
+- [x] NEMSIS Version 3 supplies field definitions, not redistributed raw data.
+- [x] Forty versioned synthetic ambulance events will be generated manually.
+- [x] Every event has an expected FHIR Bundle and evaluation labels.
 - [x] The system does not diagnose, recommend treatment, or dispatch units.
 - [x] Evaluation compares raw JSON, FHIR, and secured MCP plus FHIR.
 - [x] Normal and adversarial fixtures have measurable targets.
