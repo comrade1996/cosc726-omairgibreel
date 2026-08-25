@@ -9,6 +9,7 @@ cosc726-omairgibreel/
 |-- week01/
 |-- week02/
 |-- week03/
+|-- week04/
 |-- .github/workflows/
 |-- .gitignore
 |-- README.md
@@ -43,4 +44,4 @@ python -m pip install -r requirements.txt
 ```
 
 Each weekly folder contains its own README and requirements file. Weeks 1 and
-3 are complete; later weeks are added in separate commits.
+4 are complete; later weeks are added in separate commits.
