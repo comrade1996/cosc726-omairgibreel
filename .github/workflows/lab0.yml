@@ -50,3 +50,13 @@ jobs:
         run: python -m pip install "pydantic>=2.7,<3"
       - name: ReAct agent self-test
         run: python week04/hello_agent.py --self-test
+
+  verify-lab5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Scoped-memory self-test
+        run: python week06/layla_memory.py --self-test
