@@ -1,4 +1,4 @@
-name: Lab 0 checks
+name: Weekly assignment checks
 
 on:
   push:
@@ -16,3 +16,13 @@ jobs:
         run: python week01/COSC726_W01_hello_agent_mock.py --self-test
       - name: Annotation check
         run: python week01/COSC726_W01_hello_agent_mock.py --check
+
+  verify-lab1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: LLM foundations self-test
+        run: python week02/COSC726_W02_llm_foundations.py --self-test

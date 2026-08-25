@@ -7,10 +7,7 @@ Weekly coursework repository for Omair Gibreel.
 ```text
 cosc726-omairgibreel/
 |-- week01/
-|   |-- README.md
-|   |-- requirements.txt
-|   |-- lab0.ipynb
-|   `-- COSC726_W01_hello_agent_mock.py
+|-- week02/
 |-- .github/workflows/
 |-- .gitignore
 |-- README.md
@@ -44,4 +41,6 @@ Then install the repository requirements:
 python -m pip install -r requirements.txt
 ```
 
+Each weekly folder contains its own README and requirements file. Weeks 1 and
+2 are complete; later weeks are added in separate commits.
 
