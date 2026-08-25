@@ -46,5 +46,5 @@ python -m pip install -r requirements.txt
 ```
 
 Each weekly folder contains its own README and requirements file. Weeks 1 and
-Weeks 1-4 and 6 are complete. Week 5 contains the MCP project proposal. Later
-weeks are added in separate commits.
+Weeks 1-4 and 6 are complete. Week 5 contains the MCP ambulance handoff project
+proposal using HL7 FHIR. Later weeks are added in separate commits.

@@ -1,68 +1,108 @@
-# MCP Support Desk Gateway
+# MCP Ambulance Handoff Gateway Using HL7 FHIR
 
 **Student:** Omair Gibreel
 
 **Course:** COSC726 - Agentic Artificial Intelligence
 
-**Project topic:** Model Context Protocol (MCP)
+**Project topic:** Model Context Protocol, ambulance handoff, and HL7 FHIR
 
 ## Project summary
 
-I plan to build a secure and auditable MCP server for a customer-support agent.
-The server will expose a small set of order and policy capabilities through the
-standard MCP interface instead of placing custom Python functions directly
-inside one agent. I will then connect more than one MCP client to the same
-server and measure whether the standard interface improves portability without
-weakening the safety controls built in Week 4.
+I plan to build an MCP server that helps transfer a synthetic ambulance patient
+record to a receiving emergency department in HL7 FHIR format. The project will
+focus on interoperability and safety: validating the record, detecting missing
+handoff information, building a structured draft, enforcing patient-level
+authorization, and recording an audit trail.
 
-The demo will use synthetic Northwind Retail data. It will never apply a credit
-or modify a real customer account. The most consequential capability will only
-create a pending approval request for a human.
+The system will not diagnose a patient, recommend treatment, calculate a drug
+dose, choose a destination hospital, or dispatch an ambulance. A clinician will
+remain responsible for checking and confirming the handoff. All cases will be
+synthetic, so no real protected health information will enter the repository,
+model context, logs, or demonstration.
 
-## Problem
+## The problem
 
-An agent normally needs custom code for every data source and tool. The tool
-schema, connection method, permissions, and error handling can become tied to a
-single model provider or framework. That makes the agent harder to move and
-creates a safety problem: changing clients can accidentally bypass validation,
-approval, or logging.
+Ambulance and hospital systems may represent the same event differently. A
+prehospital record can contain demographics, times, vital signs, interventions,
+medications, and a clinical narrative, but the receiving system needs that
+information in a predictable structure. A custom integration can work for one
+application while being difficult to reuse, validate, or audit.
 
-MCP gives clients a common way to discover and use server-provided tools,
-resources, and prompts. My project asks a practical question: can I gain that
-interoperability while keeping permissions and factual checks outside the
-model?
+HL7 FHIR provides standardized healthcare resources and a JSON representation
+for exchanging clinical information. MCP gives an AI host a standard way to
+discover server-provided tools, resources, and prompt templates. My project
+combines them: FHIR standardizes the healthcare data, while MCP standardizes how
+an agent accesses validation and handoff capabilities.
+
+The project is not intended to prove that an AI model can replace a paramedic
+or emergency clinician. It asks whether an MCP server can make a narrow
+ambulance handoff workflow more interoperable, complete, and auditable while
+keeping safety decisions outside the model.
 
 ## Research questions
 
-1. Can two different MCP clients discover and use the same support server
-   without client-specific tool definitions?
-2. Can server-side validation, reference checks, permissions, and human
-   approval stop unsafe actions even when a client sends a bad request?
-3. What latency and token overhead does MCP add compared with calling the same
-   Python functions directly?
-4. Which failures remain the responsibility of the host application rather
-   than the MCP server?
+1. Can two independent MCP clients discover and use the same ambulance handoff
+   capabilities without client-specific tool definitions?
+2. Can an ePCR-like ambulance record be mapped into a valid HL7 FHIR R4 Bundle
+   without losing important source fields or inventing clinical facts?
+3. Can deterministic completeness checks identify missing handoff data more
+   reliably than asking a language model to notice it?
+4. Can server-side authorization, patient matching, and clinician confirmation
+   prevent wrong-patient disclosure and unapproved handoff submission?
+5. What latency and context-token overhead do MCP and FHIR validation add over
+   direct custom JSON processing?
 
-## Proposed system
+## Proposed workflow
+
+1. A synthetic ambulance case is loaded from the evaluation dataset.
+2. A deterministic mapper creates FHIR R4 resources and a transaction or
+   document Bundle.
+3. The MCP server exposes the authorized case as a resource.
+4. The client calls validation and completeness tools before requesting a
+   handoff draft.
+5. A language model may summarize the already-grounded fields into a MIST or
+   SBAR-style draft, with source references attached.
+6. A simulated clinician confirmation is required before the handoff can be
+   marked as sent.
+7. The server records validation results, confirmation, receiving facility,
+   timestamps, and provenance in a redacted audit trail.
 
 ```mermaid
 flowchart LR
-    A[Agent or MCP Inspector] --> B[MCP client]
-    B -->|stdio for local work| C[MCP support server]
-    B -->|Streamable HTTP demo| C
-    C --> D[Validation and permission gates]
-    D --> E[Order tools]
-    D --> F[Policy resources]
-    D --> G[Prompt templates]
-    D --> H[Pending approval queue]
-    C --> I[Audit log and evaluator]
+    A[Synthetic ambulance ePCR] --> B[FHIR mapping layer]
+    B --> C[FHIR R4 Bundle]
+    D[Agent or MCP Inspector] --> E[MCP client]
+    E -->|stdio or Streamable HTTP| F[Ambulance MCP server]
+    F --> G[Authorization and patient match]
+    G --> H[FHIR validator]
+    H --> I[Completeness and provenance checks]
+    I --> J[Draft handoff]
+    J --> K[Clinician confirmation]
+    K --> L[Simulated ED acknowledgement]
+    F --> M[Redacted audit log]
 ```
 
-I will implement the server in Python with the official MCP Python SDK. Local
-development will use `stdio` because it keeps the server private and simple.
-The demonstration will also include Streamable HTTP so transport behaviour can
-be tested explicitly. The same capability layer will sit behind both
-transports.
+## FHIR data model
+
+The implementation will target the published HL7 FHIR R4 specification and use
+a deliberately small profile suitable for the course project.
+
+| FHIR resource | Use in the project |
+|---|---|
+| `Patient` | Synthetic identifier and limited demographics needed for matching |
+| `Encounter` | Ambulance incident and transfer-of-care context |
+| `Observation` | Timestamped vital signs with explicit values and units |
+| `ClinicalImpression` | Paramedic working impression, clearly marked as provisional |
+| `MedicationAdministration` | Medication already administered, not a recommendation |
+| `Procedure` | Intervention already performed |
+| `Practitioner` and `Organization` | Synthetic ambulance crew and receiving organization |
+| `Location` | Incident and receiving locations using synthetic identifiers |
+| `Composition` and `Bundle` | Structured handoff document and contained resources |
+| `Provenance` and `AuditEvent` | Source, transformation, access, and confirmation records |
+
+Every generated value will either point to a source field or be a documented
+transformation. Missing source data will remain absent or use the appropriate
+FHIR representation; the model will not fill gaps by guessing.
 
 ## MCP capabilities
 
@@ -70,86 +110,112 @@ transports.
 
 | Tool | Tier | Behaviour |
 |---|---|---|
-| `track_order` | Read | Returns status and measured delay for one known order. |
-| `search_policy` | Read | Returns the relevant policy clause and evidence ID. |
-| `create_approval_request` | Consequential | Creates a pending request only after evidence and permission checks. |
-| `escalate_case` | Write | Creates a hand-off record for unsupported or out-of-scope work. |
+| `validate_fhir_bundle` | Read | Runs structural and project-profile validation and returns exact issues. |
+| `get_ambulance_case` | Read | Returns the authorized synthetic case and its source version. |
+| `check_handoff_completeness` | Read | Reports missing identity, timing, vital, intervention, and provenance fields. |
+| `create_handoff_draft` | Read | Creates a grounded MIST/SBAR-style draft with evidence references. |
+| `confirm_handoff` | Consequential | Marks a simulated handoff as sent only with clinician confirmation and an idempotency key. |
+| `record_ed_acknowledgement` | Write | Records a simulated receiving-department acknowledgement. |
 
-There will be no `apply_credit` tool. Removing that authority is safer than
-asking the model not to use it.
+There will be no tool for diagnosis, treatment selection, medication ordering,
+dose calculation, destination selection, or ambulance dispatch.
 
 ### Resources
 
-- `support://policies/late-delivery` - versioned late-delivery policy
-- `support://schemas/order` - public order-data schema without customer records
-- `support://runs/{run_id}` - redacted audit trace for an authorized run
+- `ambulance://cases/{case_id}/source` - authorized synthetic source record
+- `ambulance://cases/{case_id}/fhir` - mapped FHIR Bundle
+- `ambulance://cases/{case_id}/validation` - current validation report
+- `ambulance://cases/{case_id}/audit` - redacted audit trail
+- `ambulance://profiles/handoff-r4` - project data dictionary and profile rules
 
 ### Prompts
 
-- `triage_support_email` - evidence-first triage template
-- `review_failed_run` - template for explaining gate refusals to a reviewer
+- `prepare_mist_handoff` - draft a concise handoff from validated evidence
+- `prepare_sbar_handoff` - alternate structured handoff format
+- `explain_validation_failure` - explain missing or invalid fields without
+  inventing replacements
 
-Prompts are reusable guidance, not an authority boundary. The server will
-validate every tool request even if the client ignores the supplied prompt.
+The prompt templates are guidance, not security controls. The server will apply
+the same validation and authorization even if a client ignores them.
 
-## Safety and privacy design
+## Safety, security, and privacy
 
-- Every tool will have a strict Pydantic argument model with extra fields
-  forbidden.
-- Order IDs will be checked against the data store after their format is
-  validated. A well-shaped invented ID will still fail.
-- Permission scope will come from the authenticated connection, not from a
-  model-controlled argument such as `role="admin"`.
-- Consequential requests will require the order result, policy result, and an
-  explicit human-approval capability. The tool returns `pending`, never
-  `applied`.
-- Customer text and tool results will be treated as untrusted data. Tests will
-  place instructions inside both locations.
-- Logs will contain run IDs, tool names, gate outcomes, timing, and evidence
-  IDs. Secrets and raw personal data will be excluded.
-- The local server will use `stdio`. Any HTTP test will use HTTPS in a deployed
-  setting, validate origins, use authentication, and bind locally during
-  development.
-- Synthetic records will be used throughout the project.
+- The dataset will contain synthetic patients only. No real names, addresses,
+  record numbers, narratives, or images will be used.
+- The authenticated server will create the patient and user scope. The model
+  cannot gain access by passing `patient_id` or `role="doctor"` in an argument.
+- Every read will check that the case belongs to the authorized synthetic
+  tenant and current handoff session.
+- Patient matching will use more than a free-text name. The evaluation will
+  include similar identifiers and deliberately mismatched cases.
+- Clinical narrative, FHIR text fields, and tool results will be treated as
+  untrusted data because they can contain prompt injection.
+- Vital values will retain timestamps and explicit units. The system will not
+  silently convert or merge conflicting observations.
+- A draft cannot be confirmed while required identifiers, provenance, or
+  validation gates are missing.
+- `confirm_handoff` will require a clinician-confirmation claim, receiving
+  organization, current case version, and idempotency key. It will not accept a
+  confirmation requested only by the model.
+- Logs will use case and run IDs and will avoid raw patient text. Secrets and
+  authorization tokens will never be committed.
+- Local development will use `stdio`. Streamable HTTP tests will validate
+  origins, bind locally, and use scoped test authorization.
 
-## Evaluation plan
+## Evaluation dataset
 
-I will create a fixed evaluation set with at least 36 cases:
+I will create at least 40 synthetic ambulance cases:
 
-- 24 normal support requests covering every tool and stop condition;
-- 12 adversarial cases covering fabricated IDs, missing evidence, extra
-  arguments, cross-user access, repeated calls, tool-result injection, and
-  requests for a completed financial action.
+- 28 normal cases covering complete and incomplete handoffs, repeated vital
+  signs, administered medications, procedures, and receiving acknowledgements;
+- 12 adversarial cases covering wrong-patient identifiers, missing units,
+  impossible timestamps, stale case versions, duplicate confirmation, hidden
+  instructions in narrative text, cross-patient access, and a request to invent
+  a missing clinical fact.
 
-I will compare three configurations:
+Each case will have a source record, expected FHIR resources, expected missing
+fields, permitted tools, and expected stop condition. A small subset will be
+reviewed manually against the profile before it is used as an evaluation set.
 
-1. direct Python function calls;
-2. MCP with schemas but no additional policy middleware;
-3. MCP with all validation, permission, and approval gates enabled.
+## Experimental comparison
 
-The report will include:
+The same cases will be run through four configurations:
 
-- tool-selection and field accuracy;
-- schema-valid response rate;
-- reference and policy-gate rejection rate;
-- unsafe action success rate, with a target of 0%;
-- cross-user data leaks, with a target of 0;
-- task completion and correct escalation rate;
-- p50 and p95 latency;
-- token use per completed case;
-- successful discovery and execution from at least two MCP clients.
+1. custom ambulance JSON processed by direct Python functions;
+2. FHIR mapping and validation without MCP;
+3. MCP plus FHIR schemas without patient and confirmation gates;
+4. secured MCP plus FHIR with all authorization, provenance, and confirmation
+   gates enabled.
 
-All configurations will use the same data and fixtures. Model name, SDK
-version, prompt version, transport, and random settings will be recorded beside
-the results.
+The comparison will report:
+
+- FHIR structural and project-profile validity;
+- source-to-FHIR field mapping accuracy;
+- missing-field detection precision and recall;
+- unsupported or invented clinical fields, with a target of zero;
+- wrong-patient or cross-tenant disclosures, with a target of zero;
+- unconfirmed handoffs marked sent, with a target of zero;
+- duplicate handoffs after retry, with a target of zero;
+- correct completion and safe-block rates;
+- p50 and p95 local latency;
+- context tokens per case;
+- capability discovery and execution from at least two MCP clients.
+
+The model name, MCP SDK version, FHIR version, profile version, prompt version,
+transport, and case-set commit will be recorded beside every result.
 
 ## Colab and reproducibility
 
-The project will include a Colab notebook that installs pinned dependencies,
-starts the server, runs the client and fixtures, displays the audit table, and
-shuts the server down cleanly. A deterministic fake client will cover the
-safety tests without a model or API key. An optional open-weight model section
-will run on a Colab T4. No code will depend on a path from my own computer.
+The project will include a Google Colab notebook that installs pinned Python
+dependencies, creates the synthetic cases, starts the MCP server locally, runs
+the client, validates the FHIR Bundles, displays the evaluation table, and
+shuts the server down cleanly. A deterministic fake model client will run every
+safety test without an API key. An optional open-weight model section may be
+used only for the handoff wording, not for validation or authorization.
+
+No notebook cell will depend on a path from my own computer. A fresh Colab
+runtime should be able to reproduce the deterministic results from the cloned
+repository.
 
 ## Planned repository structure
 
@@ -160,65 +226,80 @@ week05/
 project/
 |-- README.md
 |-- requirements.txt
-|-- server.py
-|-- client.py
-|-- domain.py
-|-- security.py
-|-- evaluation.py
+|-- ambulance_mcp/
+|   |-- server.py
+|   |-- domain.py
+|   |-- fhir_mapping.py
+|   |-- validation.py
+|   |-- authorization.py
+|   `-- audit.py
+|-- data/synthetic_cases.json
+|-- profiles/handoff-r4.json
 |-- tests/
-`-- notebooks/mcp_demo_colab.ipynb
+`-- notebooks/ambulance_mcp_colab.ipynb
 ```
-
-The final implementation may remain inside the later weekly folder if that is
-required by the submission format, but it will keep this internal structure.
 
 ## Schedule
 
 | Week | Planned result |
 |---|---|
-| 5 | Proposal, scope, research questions, and acceptance criteria |
-| 6 | Synthetic dataset, evaluation fixtures, and threat model |
-| 7 | Core MCP server and `stdio` client |
-| 8 | Resources, prompts, Streamable HTTP, and Colab demo |
-| 9 | Authentication context, policy gates, and approval workflow |
-| 10 | Adversarial and cross-user isolation tests |
-| 11 | Baselines, latency measurements, and analysis |
-| 12 | Final report, recorded demonstration, and reproducible release |
+| 5 | Proposal, scope, safety boundaries, and research questions |
+| 6 | Synthetic ePCR schema, FHIR mapping plan, fixtures, and threat model |
+| 7 | FHIR mapper, validator, and deterministic tests |
+| 8 | MCP `stdio` server with tools, resources, and prompts |
+| 9 | Patient-scoped authorization, confirmation gate, and audit events |
+| 10 | Streamable HTTP and adversarial testing |
+| 11 | Baselines, measurements, error analysis, and Colab notebook |
+| 12 | Final report, reproducible release, and demonstration |
 
 ## Deliverables
 
-- runnable Python MCP server and two clients;
+- Python MCP server implementing the ambulance handoff capabilities;
+- synthetic ambulance dataset and expected FHIR Bundles;
+- FHIR mapping and validation rules;
+- two MCP clients or one client plus the MCP Inspector;
 - Colab demonstration notebook;
-- synthetic evaluation dataset and automated tests;
-- threat model and security test report;
-- comparison table for accuracy, safety, latency, and token use;
-- final report and short demonstration video or live walkthrough.
+- automated normal, authorization, and adversarial tests;
+- threat model and privacy design;
+- accuracy, safety, latency, and token comparison table;
+- final report and demonstration.
 
 ## Risks and fallback plan
 
-The Python SDK may change during the semester, so I will pin the implementation
-version and record it in every result. If Streamable HTTP deployment becomes a
-time risk, `stdio` will remain the tested core and HTTP will be shown locally.
-If the open model is too slow, the deterministic client will still demonstrate
-the complete protocol, gates, and evaluation. If two full agent hosts cannot
-run in Colab, the second interoperability check will use the official MCP
-Inspector or a small independent SDK client.
+FHIR can become too broad for one course project. I will restrict the profile
+to the listed resources and fields rather than attempting a complete electronic
+patient care record. If a full terminology server is unavailable, the project
+will validate a documented local value set and report that limitation. If
+Streamable HTTP takes too much time, the tested core will remain `stdio` and the
+HTTP demonstration will stay local. If a real model is slow or unreliable, the
+deterministic client will still demonstrate all protocol, validation,
+authorization, and audit requirements.
+
+The NEMSIS standard may be used as a reference for prehospital field names, but
+full NEMSIS certification and a complete NEMSIS-to-FHIR implementation are out
+of scope. The project will publish a small, explicit mapping table instead.
 
 ## Success criteria
 
-The project is successful when a fresh Colab runtime can run the documented
-demo, two clients can discover the same capabilities, all normal fixtures
-produce the expected tool or escalation, every adversarial consequential call
-is denied or left pending for a human, no cross-user record is returned, and
-the final report explains MCP's measured cost and benefit rather than only
-showing that the server starts.
+The project will be considered successful when a fresh Colab runtime can run
+the documented demonstration; two clients can discover the same MCP
+capabilities; every generated handoff Bundle passes the declared FHIR profile;
+normal cases preserve their expected source fields; missing fields are reported
+without invention; cross-patient reads and unconfirmed submissions always
+fail; repeated confirmation does not create duplicates; and the final report
+measures what MCP and FHIR added instead of only showing that the server starts.
 
 ## References
 
+- [HL7 FHIR R4 specification](https://hl7.org/fhir/R4/)
+- [FHIR Patient resource](https://hl7.org/fhir/R4/patient.html)
+- [FHIR Observation resource](https://hl7.org/fhir/R4/observation.html)
+- [FHIR Encounter resource](https://hl7.org/fhir/R4/encounter.html)
+- [FHIR Bundle resource](https://hl7.org/fhir/R4/bundle.html)
+- [FHIR Provenance resource](https://hl7.org/fhir/R4/provenance.html)
+- [FHIR AuditEvent resource](https://hl7.org/fhir/R4/auditevent.html)
+- [SMART App Launch authorization guide](https://hl7.org/fhir/smart-app-launch/)
+- [NEMSIS Version 3 technical resources](https://nemsis.org/technical-resources/version-3/)
 - [Model Context Protocol specification](https://modelcontextprotocol.io/specification/latest)
-- [MCP server tools](https://modelcontextprotocol.io/specification/latest/server/tools)
-- [MCP server resources](https://modelcontextprotocol.io/specification/latest/server/resources)
-- [MCP server prompts](https://modelcontextprotocol.io/specification/latest/server/prompts)
-- [MCP transports](https://modelcontextprotocol.io/specification/latest/basic/transports)
 - [Official MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)
 - [MCP security best practices](https://modelcontextprotocol.io/specification/latest/basic/security_best_practices)

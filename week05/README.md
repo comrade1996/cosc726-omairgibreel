@@ -1,12 +1,13 @@
-# Week 5 - MCP Project Proposal
+# Week 5 - MCP and HL7 FHIR Project Proposal
 
-My course project is a secure Model Context Protocol server for a customer
-support agent. The proposal turns the support tools from Weeks 3 and 4 into a
-standard MCP interface and evaluates both interoperability and safety.
+My course project is an MCP-based ambulance handoff gateway using HL7 FHIR. It
+converts synthetic prehospital records into validated FHIR resources and helps
+prepare a safe, auditable handoff for the receiving emergency department.
 
 - `project_proposal.md` - full proposal, scope, design, evaluation, and schedule
 - `proposal_checklist.md` - short completion and acceptance checklist
 
-This week is a proposal assignment, so implementation code is intentionally
-scheduled for the later project milestones. The planned demo will run in Google
-Colab and will not require private customer data.
+This week is a proposal assignment, so implementation code is scheduled for
+later project milestones. The planned demo will run in Google Colab, use only
+synthetic patients, and will not diagnose, recommend treatment, or dispatch an
+ambulance.
