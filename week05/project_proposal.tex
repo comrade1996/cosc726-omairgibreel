@@ -1,6 +1,6 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 
-\usepackage[a4paper,margin=25mm,headheight=15pt]{geometry}
+\usepackage[a4paper,margin=18mm,top=19mm,bottom=17mm,headheight=13pt]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{microtype}
@@ -31,12 +31,14 @@
 }
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-\setlist{itemsep=2pt,topsep=4pt,leftmargin=*}
-\renewcommand{\arraystretch}{1.18}
-\titleformat{\section}{\Large\bfseries\color{navy}}{\thesection}{0.65em}{}
-\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{0.65em}{}
+\setlength{\parskip}{3pt}
+\setlist{itemsep=0pt,topsep=2pt,parsep=0pt,leftmargin=*}
+\renewcommand{\arraystretch}{1.08}
+\titleformat{\section}{\large\bfseries\color{navy}}{\thesection}{0.55em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{teal}}{\thesubsection}{0.55em}{}
 \titleformat{\subsubsection}{\normalsize\bfseries\color{navy}}{\thesubsubsection}{0.65em}{}
+\titlespacing*{\section}{0pt}{8pt}{3pt}
+\titlespacing*{\subsection}{0pt}{5pt}{2pt}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -50,36 +52,26 @@
 
 \begin{document}
 
-\begin{titlepage}
-  \thispagestyle{empty}
-  \vspace*{22mm}
-  {\color{teal}\rule{\textwidth}{2.2pt}}\\[14mm]
-  {\Huge\bfseries\color{navy}\proposalTitle\par}
-  \vspace{8mm}
-  {\Large Project Proposal\par}
-  \vspace{18mm}
+{\color{teal}\rule{\textwidth}{1.6pt}}\\[3mm]
+{\LARGE\bfseries\color{navy}\proposalTitle\par}
+\vspace{1mm}
+{\large Project Proposal\par}
+\vspace{3mm}
 
-  \begin{tabular}{@{}>{\bfseries\color{navy}}p{35mm}p{105mm}@{}}
-    Student & Omair Gibreel \\
-    Course & COSC726 - Agentic Artificial Intelligence \\
-    Week & Week 5 \\
-    Project topic & Model Context Protocol, ambulance handoff, and HL7 FHIR \\
-    Dataset & Synthea FHIR R4 patients, NEMSIS field definitions, and manually generated synthetic ambulance events \\
-  \end{tabular}
+\begin{tabular}{@{}>{\bfseries\color{navy}}p{27mm}p{139mm}@{}}
+  Student & Omair Gibreel \\
+  Course & COSC726 - Agentic Artificial Intelligence, Week 5 \\
+  Project topic & Model Context Protocol, ambulance handoff, and HL7 FHIR \\
+  Dataset & Synthea FHIR R4 patients, NEMSIS field definitions, and manually generated synthetic ambulance events \\
+\end{tabular}
 
-  \vfill
-  \colorbox{lightblue}{%
-    \begin{minipage}{0.93\textwidth}
-      \vspace{3mm}
-      \textbf{Safety boundary.} This project uses synthetic data only. It does not diagnose a patient, recommend treatment, calculate a medication dose, select a destination hospital, or dispatch an ambulance. A clinician remains responsible for reviewing and confirming every handoff.
-      \vspace{3mm}
-    \end{minipage}}
-  \vfill
-  {\color{teal}\rule{\textwidth}{2.2pt}}
-\end{titlepage}
-
-\tableofcontents
-\newpage
+\vspace{2mm}
+\colorbox{lightblue}{%
+  \begin{minipage}{0.95\textwidth}
+    \small\textbf{Safety boundary.} This project uses synthetic data only. It does not diagnose, recommend treatment, calculate medication doses, select a destination, or dispatch an ambulance. A clinician reviews and confirms every handoff.
+  \end{minipage}}
+\vspace{2mm}
+{\color{teal}\rule{\textwidth}{1.2pt}}
 
 \section{Project Summary}
 
@@ -275,6 +267,7 @@ Each case will have a source record, expected FHIR resources, expected missing f
 
 The train/test distinction is simple because this is an integration and safety evaluation, not model training. Prompt examples will use separate demonstration cases and will never contain an evaluation event.
 
+\newpage
 \section{Experimental Comparison}
 
 The same cases will be run through four configurations:
@@ -303,42 +296,6 @@ The comparison will report:
 \end{itemize}
 
 The model name, MCP SDK version, FHIR version, profile version, prompt version, transport, and case-set commit will be recorded beside every result.
-
-\section{Google Colab and Reproducibility}
-
-The project will include a Google Colab notebook that installs pinned Python dependencies, downloads or reads the pinned Synthea FHIR R4 sample, verifies its checksum, generates the ambulance events from versioned templates, starts the MCP server locally, runs the client, validates the FHIR Bundles, displays the evaluation table, and shuts the server down cleanly. A deterministic fake model client will run every safety test without an API key. An optional open-weight model section may be used only for handoff wording, not for validation or authorization.
-
-No notebook cell will depend on a path from my own computer. A fresh Colab runtime should be able to reproduce the deterministic results from the cloned repository.
-
-\section{Planned Repository Structure}
-
-\begin{verbatim}
-week05/
-|-- project_proposal.md
-|-- project_proposal.tex
-|-- output/pdf/project_proposal.pdf
-`-- proposal_checklist.md
-project/
-|-- README.md
-|-- requirements.txt
-|-- ambulance_mcp/
-|   |-- server.py
-|   |-- domain.py
-|   |-- fhir_mapping.py
-|   |-- validation.py
-|   |-- authorization.py
-|   `-- audit.py
-|-- data/
-|   |-- source/synthea_patients/
-|   |-- source/ambulance_events/
-|   |-- expected/fhir_bundles/
-|   `-- labels/evaluation_labels.json
-|-- mappings/nemsis_to_fhir.csv
-|-- scripts/build_dataset.py
-|-- profiles/handoff-r4.json
-|-- tests/
-`-- notebooks/ambulance_mcp_colab.ipynb
-\end{verbatim}
 
 \section{Schedule}
 
@@ -377,9 +334,9 @@ project/
 
 The project will be considered successful when a fresh Colab runtime can run the documented demonstration; two clients can discover the same MCP capabilities; every generated handoff Bundle passes the declared FHIR profile; normal cases preserve their expected source fields; missing fields are reported without invention; cross-patient reads and unconfirmed submissions always fail; repeated confirmation does not create duplicates; and the final report measures what MCP and FHIR added instead of only showing that the server starts.
 
-\newpage
 \section{References}
 
+\small
 \begin{enumerate}[label={[\arabic*]}]
   \item MITRE, ``Synthea Synthetic Patient Downloads.'' \url{https://synthea.mitre.org/downloads}
   \item HL7 International, ``FHIR Release 4 Specification.'' \url{https://hl7.org/fhir/R4/}

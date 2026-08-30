@@ -261,51 +261,6 @@ The comparison will report:
 The model name, MCP SDK version, FHIR version, profile version, prompt version,
 transport, and case-set commit will be recorded beside every result.
 
-## Colab and reproducibility
-
-The project will include a Google Colab notebook that installs pinned Python
-dependencies, downloads or reads the pinned Synthea FHIR R4 sample, verifies its
-checksum, generates the ambulance events from versioned templates, starts the
-MCP server locally, runs the client, validates the FHIR Bundles, displays the
-evaluation table, and shuts the server down cleanly. A deterministic fake model
-client will run every safety test without an API key. An optional open-weight
-model section may be used only for handoff wording, not for validation or
-authorization.
-
-No notebook cell will depend on a path from my own computer. A fresh Colab
-runtime should be able to reproduce the deterministic results from the cloned
-repository.
-
-## Planned repository structure
-
-```text
-week05/
-|-- project_proposal.md
-|-- project_proposal.tex
-|-- output/pdf/project_proposal.pdf
-`-- proposal_checklist.md
-project/
-|-- README.md
-|-- requirements.txt
-|-- ambulance_mcp/
-|   |-- server.py
-|   |-- domain.py
-|   |-- fhir_mapping.py
-|   |-- validation.py
-|   |-- authorization.py
-|   `-- audit.py
-|-- data/
-|   |-- source/synthea_patients/
-|   |-- source/ambulance_events/
-|   |-- expected/fhir_bundles/
-|   `-- labels/evaluation_labels.json
-|-- mappings/nemsis_to_fhir.csv
-|-- scripts/build_dataset.py
-|-- profiles/handoff-r4.json
-|-- tests/
-`-- notebooks/ambulance_mcp_colab.ipynb
-```
-
 ## Schedule
 
 | Week | Planned result |
