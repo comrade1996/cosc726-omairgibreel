@@ -281,6 +281,8 @@ repository.
 ```text
 week05/
 |-- project_proposal.md
+|-- project_proposal.tex
+|-- output/pdf/project_proposal.pdf
 `-- proposal_checklist.md
 project/
 |-- README.md

@@ -6,4 +6,5 @@ __pycache__/
 tmp/
 *.zip
 *.pdf
+!week05/output/pdf/project_proposal.pdf
 *.crdownload
