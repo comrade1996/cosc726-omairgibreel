@@ -333,23 +333,6 @@ project/
 - accuracy, safety, latency, and token comparison table;
 - final report and demonstration.
 
-## Risks and fallback plan
-
-FHIR can become too broad for one course project. I will restrict the profile
-to the listed resources and fields rather than attempting a complete electronic
-patient care record. If a full terminology server is unavailable, the project
-will validate a documented local value set and report that limitation. If
-Streamable HTTP takes too much time, the tested core will remain `stdio` and the
-HTTP demonstration will stay local. If a real model is slow or unreliable, the
-deterministic client will still demonstrate all protocol, validation,
-authorization, and audit requirements.
-
-The NEMSIS standard will be used as a reference for prehospital field names,
-but full NEMSIS certification and a complete NEMSIS-to-FHIR implementation are
-out of scope. The project will publish a small, explicit mapping table instead.
-If the Synthea download changes, the build script will fail its checksum check
-instead of silently creating a different dataset.
-
 ## Success criteria
 
 The project will be considered successful when a fresh Colab runtime can run
