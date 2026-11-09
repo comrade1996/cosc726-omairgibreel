@@ -1,0 +1,39 @@
+digraph G {
+  rankdir=TB; fontname="Helvetica"; nodesep=0.3; ranksep=0.35; newrank=true;
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#f5f7fa", color="#5b6b7f"];
+  edge [fontname="Helvetica", fontsize=8, color="#5b6b7f"];
+
+  subgraph cluster_data { label="Synthetic data (committed, versioned)"; style="dashed"; color="#9aa5b1"; fontsize=10;
+    synthea [label="Synthea FHIR R4\n20 patients (SHA-256 pinned)"];
+    events  [label="40 NEMSIS v3.5-style events\n+ labels (oracle)"];
+  }
+
+  subgraph cluster_host { label="MCP host (trusted)"; style="rounded"; color="#2f6f4f"; fontsize=10;
+    llm    [label="ModelClient seam\nmock | faulty | OpenAI-compatible\n(Qwen2.5-7B via Ollama)", fillcolor="#fff7e6"];
+    loop   [label="ReAct loop\nturn cap, token budget,\nloop + unknown-tool detection"];
+    critic [label="Grounding + policy critic\n(reject -> replan)"];
+    gate   [label="Clinician approval gate\nholds APPROVAL key", fillcolor="#e8f5e9"];
+  }
+
+  subgraph cluster_server { label="Ambulance handoff MCP server (trusted)"; style="rounded"; color="#1f4e79"; fontsize=10;
+    tools  [label="7 tools | 5 resources | 3 prompts\nstrict schemas"];
+    scope  [label="Session scope\n(HMAC token, never an argument)"];
+    map    [label="Mapper -> FHIR R4 document Bundle\n+ Provenance"];
+    val    [label="Validator (structure + profile)\nPatient match | Completeness"];
+    draft  [label="Grounded MIST/SBAR draft\n(evidence refs, gaps stated)"];
+    confirm[label="confirm_handoff gates:\napproval token, version,\ndraft hash, idempotency", fillcolor="#fdecea"];
+    audit  [label="Redacted audit\n(FHIR AuditEvent view)"];
+  }
+  ed [label="Simulated ED\nacknowledgement"];
+  http [label="2nd client: Streamable HTTP\nbearer + Origin check"];
+
+  synthea -> map; events -> map;
+  llm -> loop [dir=both, label="actions / observations"];
+  loop -> critic;
+  loop -> tools [label="stdio (MCP)"];
+  http -> tools [label="HTTP (MCP)"];
+  loop -> gate [label="consequential call"];
+  gate -> confirm [label="signed approval"];
+  tools -> scope -> map -> val -> draft -> confirm -> ed;
+  scope -> audit; confirm -> audit;
+}
