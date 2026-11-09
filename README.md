@@ -36,7 +36,7 @@ python -m project.agent.host --case AMB-019 --approve auto
 # 3. Controlled failure and recovery: hallucinated tool + invented BP are caught, then fixed
 python -m project.agent.host --case AMB-001 --model faulty --approve auto
 
-# 4. Tests (150) and the full evaluation (40 cases x 4 configurations), gated on thresholds
+# 4. Tests (151) and the full evaluation (40 cases x 4 configurations), gated on thresholds
 python -m pytest -q tests
 python -m evals.run_eval --check
 ```
@@ -114,6 +114,16 @@ npx @modelcontextprotocol/inspector -e AMBULANCE_SESSION_KEY=... -e AMBULANCE_AP
 
 **Google Colab.** Open `notebooks/COSC726_Project_Demo_Colab.ipynb`, then choose
 Runtime > Run all.
+
+**Rebuild the report and demo video (optional; macOS, needs pandoc and Google Chrome).** Every
+number in the report is filled in from `evals/results/`:
+
+```bash
+python report/build_report.py --video-url https://youtu.be/<id>
+bash report/video/capture.sh /tmp/vid
+python -m pip install imageio-ffmpeg==0.6.0
+python report/video/build_video.py --captures /tmp/vid --out demo.mp4
+```
 
 **Rebuild the dataset (optional; outputs are committed).**
 `python scripts/select_synthea.py` re-downloads the pinned Synthea archive (85 MB, hash-checked).

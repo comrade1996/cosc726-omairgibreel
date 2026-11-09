@@ -92,6 +92,28 @@ def test_token_budget_is_enforced():
     run(with_session("CREW-A", go))
 
 
+class DriftingModel:
+    """Reproduces the goal drift seen with Qwen on AMB-024: wander off to other cases, then answer."""
+
+    name = "drifting"
+
+    def __init__(self):
+        self.steps = [("list_assigned_cases", {}), ("get_ambulance_case", {"case_id": "AMB-005"})]
+
+    def next_action(self, messages, tools):
+        if self.steps:
+            name, args = self.steps.pop(0)
+            return Action("tool", name, args, call_id=f"c{len(messages)}")
+        return Action("final", text="Handoff AMB-001 NOT sent (blocked_incomplete). Missing: none.")
+
+
+def test_task_scope_guard_blocks_goal_drift():
+    async def go(s, keys):
+        res = await Agent(s, DriftingModel(), ApprovalGate(keys, "auto"), verbose=False).run("AMB-001")
+        assert res.task_scope_blocks == 2 and res.tool_calls == [] and not res.sent
+    run(with_session("CREW-A", go))
+
+
 def test_critic():
     assert critic("HR 82 /min", '{"value": 82}') == []
     assert "unsupported number 120" in critic("BP 120/80", '{"value": 82}')

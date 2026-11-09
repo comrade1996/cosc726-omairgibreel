@@ -94,8 +94,9 @@ class MockModel:
                 "Act: request clinician approval via the host gate, then confirm.")
         result = last["confirm_handoff"]
         if result.get("status") != "sent":
-            return Action("final", rationale="Confirmation refused; report it.",
-                          text=f"Handoff {case_id} NOT sent: {result.get('error', 'declined')} {result.get('detail', '')}".strip())
+            error, detail = result.get("error", "declined"), result.get("detail", "")
+            extra = f" ({detail})" if detail and detail != error.replace("_", " ") else ""
+            return Action("final", rationale="Confirmation refused; report it.", text=f"Handoff {case_id} NOT sent: {error}{extra}")
         return Action("final", rationale="Observe: sent; summarise only grounded lines.",
                       text=self._summary(case_id, draft, result))
 
@@ -145,7 +146,8 @@ class OpenAICompatibleModel:
         model = os.environ.get("LLM_MODEL", "")
         if not model:
             raise SystemExit("Set LLM_MODEL (and LLM_BASE_URL / LLM_API_KEY) in .env to use --model openai.")
-        return cls(base, key, model, float(os.environ.get("LLM_TEMPERATURE", "0")))
+        return cls(base, key, model, float(os.environ.get("LLM_TEMPERATURE", "0")),
+                   float(os.environ.get("LLM_TIMEOUT", "180")))
 
     def next_action(self, messages: list[dict], tools: list[dict]) -> Action:
         import httpx

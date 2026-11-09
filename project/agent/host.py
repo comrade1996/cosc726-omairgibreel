@@ -36,6 +36,8 @@ from .model import Action, ModelClient, make_model
 SYSTEM_PROMPT = (Path(__file__).resolve().parents[1] / "prompts" / "agent_system_v1.txt").read_text()
 TRACE_DIR = REPO / "project" / "runtime" / "traces"
 CONSEQUENTIAL = {"confirm_handoff"}
+# Task scope (host-side least privilege): the server authorises the crew; the host narrows that to the one task case.
+TASK_OFF_LIMITS = {"list_assigned_cases"}
 FORBIDDEN_CLAIMS = re.compile(r"\b(diagnosed with|(the |final |likely )diagnosis is|i recommend|recommended (treatment|dose)|"
                               r"should (receive|be given|be treated)|consider (giving|administering)|give \d+ ?(mg|ug|ml|g)\b)",
                               re.I)
@@ -75,6 +77,7 @@ class RunResult:
     latency_ms: float
     critic_rejections: int = 0
     unknown_tool_calls: int = 0
+    task_scope_blocks: int = 0
     approvals_requested: int = 0
     sent: bool = False
     trace_path: str | None = None
@@ -276,6 +279,11 @@ class Agent:
                 res.unknown_tool_calls += 1
                 observation = json.dumps({"ok": False, "error": "unknown_tool", "detail": f"'{action.name}' is not advertised by "
                                           f"this server. Available: {sorted(names)}"})
+                is_error = True
+            elif action.name in TASK_OFF_LIMITS or action.arguments.get("case_id", case_id) != case_id:
+                res.task_scope_blocks += 1
+                observation = json.dumps({"ok": False, "error": "outside_task_scope",
+                                          "detail": f"this task is case {case_id} only; finish it or escalate"})
                 is_error = True
             else:
                 args = dict(action.arguments)
