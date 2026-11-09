@@ -7,11 +7,13 @@ title: "MCP Ambulance Handoff Gateway: an agentic, human-gated HL7 FHIR R4 hando
 <h1 class="tp-title">MCP Ambulance Handoff Gateway</h1>
 <div class="tp-sub">An agentic, human-gated system for ambulance-to-emergency-department handoff using the Model Context Protocol and HL7 FHIR R4</div>
 <table class="tp-table">
-<tr><td>Student</td><td>Omair Gibreel</td></tr>
+<tr><td>Team identifier</td><td>OmairGibreel (individual project)</td></tr>
+<tr><td>Student</td><td>Omair Gibreel - student number 0</td></tr>
 <tr><td>Repository</td><td><a href="{{REPO_URL}}">{{REPO_URL}}</a></td></tr>
 <tr><td>Demo video (unlisted)</td><td><a href="{{VIDEO_URL}}">{{VIDEO_URL}}</a></td></tr>
 <tr><td>Release evaluated</td><td>commit <code>{{META.git_commit}}</code>, evaluation run {{META.generated_at}}</td></tr>
 <tr><td>Word count</td><td>{{WORDS}} words (main body, excluding title page, tables, references and appendices)</td></tr>
+<tr><td>Domain</td><td>Health (synthetic data only)</td></tr>
 <tr><td>Date</td><td>{{DATE}}</td></tr>
 </table>
 <div class="tp-note">All patient data in this project is synthetic (Synthea). The system does not diagnose, recommend treatment, calculate doses, choose a destination or dispatch, and it is not a medical device.</div>
@@ -27,7 +29,7 @@ Handing over a patient from an ambulance crew to an emergency department (ED) is
 
 ### 1.1 The problem
 
-At handoff a paramedic must transfer identity, timings, the mechanism or illness, the working impression, the vital-sign trend and the treatment given. The receiving team must be able to trust every one of those facts. Handoff failures are a recognised patient-safety problem. Omissions are common, structured mnemonics such as MIST and SBAR exist precisely because free recall is unreliable, and information that is not in the receiving system tends to be lost after the verbal exchange. Ambulance electronic patient care records (ePCRs) and hospital systems usually represent the same facts differently. Point-to-point integrations work for one pair of systems but are hard to reuse, validate or audit.
+At handoff a paramedic must transfer identity, timings, the mechanism or illness, the working impression, the vital-sign trend and the treatment given. The receiving team must be able to trust every one of those facts. Structured mnemonics such as MIST and SBAR exist because free recall at handoff is unreliable. Ambulance electronic patient care records (ePCRs) and hospital systems usually represent the same facts differently. Point-to-point integrations work for one pair of systems but are hard to reuse, validate or audit.
 
 Two standards address different halves of this problem. HL7 FHIR R4 standardises the clinical payload as resources such as `Patient`, `Encounter`, `Observation`, `MedicationAdministration`, `Composition` and `Provenance`. MCP standardises how an AI application discovers and calls external capabilities as tools, resources and prompts. My project asks whether combining them yields a handoff workflow that is more interoperable, complete and auditable, while keeping every safety decision outside the language model.
 
@@ -51,7 +53,7 @@ The reference system is the MCP specification and its official Python SDK. MCP i
 
 On the clinical side, FHIR R4 (4.0.1) supplies the resource model. SMART App Launch describes how a real deployment would scope access to one patient and user. NEMSIS v3.5.0 is the US national EMS data dictionary. I used it only for field definitions such as `eVitals.12` (pulse oximetry) and `eTimes.09` (unit left scene), and I verified each identifier against the official dictionary. Synthea provides realistic synthetic FHIR patients that can be redistributed.
 
-On the agentic side, the host follows the ReAct pattern of interleaved reasoning and acting (Yao et al., 2022). It adds the reliability controls taught in weeks 4, 9 and 10: turn caps, budgets, approval gates before the most consequential tool, audit trails, and a least-privilege response to indirect prompt injection as framed by the OWASP Top 10 for Agentic Applications (2026). The critic-and-replan step follows the catalogue's suggested stretch and the self-critique literature (Shinn et al., 2023), except that my critic is deterministic rather than model-based.
+On the agentic side, the host follows the ReAct pattern of interleaved reasoning and acting (Yao et al., 2022). It adds the controls from weeks 4, 9 and 10 (budgets, approval gates, audit, least privilege against the OWASP Agentic Top 10) and a deterministic critic-and-replan step in the spirit of Reflexion (Shinn et al., 2023).
 
 ## 3. System design
 
@@ -64,6 +66,16 @@ The dataset has three linked layers (Appendix B). Twenty patients were selected 
 ### 3.2 The MCP server
 
 The server (`project/server.py`) is a thin adapter over one `HandoffService` class, so every configuration in the evaluation runs the same logic. It exposes seven tools. Five are read-only (`list_assigned_cases`, `get_ambulance_case`, `validate_fhir_bundle`, `check_handoff_completeness`, `create_handoff_draft`). One is consequential (`confirm_handoff`, annotated `destructiveHint`), and one is a simulated ED write (`record_ed_acknowledgement`). It also exposes five resources (`ambulance://cases/{id}/source|fhir|validation|audit` and the profile) and three prompt templates. Every tool schema sets `additionalProperties: false`. The SDK silently drops unknown arguments by default, so I subclassed it to *reject and audit* them. An argument like `role="doctor"` is therefore refused and recorded rather than ignored.
+
+| Tool | Permission tier | Gate |
+|---|---|---|
+| `list_assigned_cases`, `get_ambulance_case`, `validate_fhir_bundle`, `check_handoff_completeness`, `create_handoff_draft` | Read (idempotent) | Session scope; host task-scope guard |
+| `record_ed_acknowledgement` | Write (simulated ED) | Only after a sent handoff; receiving org must match |
+| `confirm_handoff` | Consequential | Human approval token bound to draft hash, version and org; idempotency key |
+
+*Table A. Tool inventory and permission tiers.*
+
+**Patterns and why.** *Planning:* a single ReAct loop, because the workflow is short and linear, and the week 7 lesson was that a planner layer is not worth its cost on such tasks. *Memory:* deliberately none beyond per-case working state and the audit log, so no stale cross-case context can leak between patients. *Multi-agent:* not used, because one tool-using agent plus a deterministic critic is the baseline that a crew would have to beat (week 8), and inter-agent messaging would add an ASI07 attack surface. *Oversight:* a human approval gate before the only consequential tool, as in week 9.
 
 The mapper builds a FHIR `document` Bundle. The Composition comes first and has MIST-ordered sections. Vitals become LOINC-coded Observations with UCUM units, blood pressure becomes a panel with components, the working impression becomes a `ClinicalImpression` labelled "provisional, not a diagnosis", and treatments become `Procedure` and `MedicationAdministration` resources. A `Provenance` resource targets every entry and records a hash of the source event. Two rules make the mapper safe. **Absent data stays absent.** A missing SpO2 produces no Observation, and a treatment section with no entries gets an `emptyReason` of `nilknown` only if the crew documented "no treatment". **Units are copied, never converted.** A temperature in `[degF]` is kept and flagged, not silently turned into Celsius.
 
@@ -83,7 +95,7 @@ A deterministic critic checks every final answer before it is accepted. It rejec
 
 ## 4. Implementation notes and deviations from the proposal
 
-The implementation is Python 3.11+ with three runtime dependencies (`mcp` 1.30, `fhir.resources` 8.3, `tiktoken`), all pinned. I chose the MCP SDK's 1.x line over the newer 2.x release because the 1.x API was stable, well documented and interoperable with existing hosts and the MCP Inspector. The 2.x line renames core classes and was released during the project. The repository has 151 automated tests covering the pipeline, every security gate, and end-to-end MCP runs over stdio and HTTP. A GitHub Actions job runs the tests and the evaluation with thresholds, so a safety regression fails the build.
+The agent is built on the **official MCP Python SDK (FastMCP)** for the server and client, with a hand-built ReAct controller rather than LangGraph or CrewAI. As in my week 5 decision record, a framework would hide the exact control flow that the gates depend on. The implementation is Python 3.11+ with three runtime dependencies (`mcp` 1.30, `fhir.resources` 8.3, `tiktoken`), all pinned. I pinned the SDK's stable 1.x line, because 2.x renamed core classes mid-project. The repository has 151 automated tests covering the pipeline, every security gate, and end-to-end MCP runs over stdio and HTTP. A GitHub Actions job runs the tests and the evaluation with thresholds, so a safety regression fails the build.
 
 Four deviations from the proposal are worth recording:
 
@@ -123,7 +135,7 @@ Separately, I ran the 40 cases through C4 with **Qwen2.5-7B-Instruct** (temperat
 
 **RQ4 (safety gates).** Table 1 shows that FHIR validation alone (C2/C3) stops malformed data such as missing units, impossible or future timestamps, and the "invent a value" attack. It does nothing about authority. With the gates off, both lookalike and wrong-MRN patients were sent, a forged confirmation and a replayed stale approval both succeeded, retries produced {{C3.duplicate_sends}} duplicate sends, and other crews' cases were disclosed {{C3.cross_patient_disclosures}} times. MCP on its own (C3) is no safer than direct calls (C2). The protocol standardises access; it does not authorise it. Only C4 reached zero on every safety metric and blocked all {{C4.attacks_blocked}} attacks while still completing every complete case.
 
-**RQ5 (cost).** On this machine MCP over stdio added roughly {{OVERHEAD.mcp_ms}} ms per case at the median (C2 p50 {{C2.latency_p50_ms}} ms vs. C3 {{C3.latency_p50_ms}} ms). The gates added no measurable median cost (C4 {{C4.latency_p50_ms}} ms); C4's p95 of {{C4.latency_p95_ms}} ms reflects first-call warm-up of each server process. The 849-token tool schemas are resent on every turn, and observations accumulate, so an agent consumes about {{C4.context_tokens_mean}} context tokens per case against {{C4.payload_tokens_mean}} tokens of tool results. Context growth, not MCP, dominates cost. With a real model, latency was {{LLM.latency_p50_s}} s per case at the median on a laptop CPU/GPU, roughly four orders of magnitude more than all the plumbing combined.
+**RQ5 (cost).** On this machine MCP over stdio added roughly {{OVERHEAD.mcp_ms}} ms per case at the median (C2 p50 {{C2.latency_p50_ms}} ms vs. C3 {{C3.latency_p50_ms}} ms). The gates added no measurable median cost (C4 {{C4.latency_p50_ms}} ms); C4's p95 of {{C4.latency_p95_ms}} ms reflects first-call warm-up of each server process. The 849-token tool schemas are resent on every turn, and observations accumulate, so an agent consumes about {{C4.context_tokens_mean}} context tokens per case against {{C4.payload_tokens_mean}} tokens of tool results. Context growth, not MCP, dominates cost. Monetary cost was zero (local model); at hosted prices the per-case cost is these token counts times the provider's rate. With a real model, latency was {{LLM.latency_p50_s}} s per case at the median on a laptop CPU/GPU, roughly four orders of magnitude more than all the plumbing combined.
 
 ### 6.1 Real-LLM agent
 
@@ -141,7 +153,7 @@ My first fix was a better instruction. The message now spells out the exact `con
 
 ## 7. Reliability and deployment
 
-Reliability is demonstrated by test as well as by narration. The repository includes tests that prove each control:
+Each control is proven by a test:
 
 - a hallucinated tool returns `unknown_tool` and the run recovers;
 - an invented "BP 120/80" is rejected by the critic and the revised answer is accepted;
@@ -155,19 +167,24 @@ Reliability is demonstrated by test as well as by narration. The repository incl
 
 The `faulty` model reproduces the hallucinated-tool and invented-value failures on demand for the demonstration.
 
-Deployment is deliberately local and responsible. The default transport is stdio, launched by the host with per-run ephemeral keys, so no secrets exist on disk and no `.env` file is needed. HTTP mode refuses to bind to anything but localhost, refuses to run with the gates disabled, exposes `/healthz` with server, mapping and profile versions, and requires bearer tokens. Traces and the audit log are written as JSON for inspection. The evaluation records the model, SDK, FHIR, mapping, profile and prompt versions and the commit beside every result. A real deployment would replace the HMAC tokens with SMART on FHIR / OAuth 2.1 scopes from the hospital's identity provider, put keys in a KMS, use the HL7 validator, and run behind the trust's integration engine. Appendix A sets out the remaining gaps.
+Deployment is deliberately local. Stdio uses per-run ephemeral keys, so no secrets exist on disk. HTTP binds only to localhost, refuses to run with the gates off, requires bearer tokens and exposes `/healthz`. Versions and the commit are recorded beside every result. Production would need SMART on FHIR scopes, a KMS and the HL7 validator (Appendix A).
 
-## 8. Limitations and future work
+## 8. Responsible design
+
+Responsible design is built into the control flow, not added after it. Appendix A gives the full risk register. **Risk designed against:** a wrong-patient, unapproved or fabricated handoff. **Guardrails:** absent data stays absent; there is no tool for clinical decisions; strict schemas; session scope; patient matching; a grounding and policy critic; and a task-scope guard. **Human oversight:** the clinician gate is the only holder of the approval key, so nothing is sent without a person seeing the exact draft. **Privacy and governance:** synthetic, minimised data; a redacted audit trail; no secrets in the repository; and a local model, so no data leaves the machine. Each control maps to an OWASP ASI risk and a test (`docs/threat_model.md`).
+
+## 9. Limitations and future work
 
 - **Synthetic, template-generated data.** The cases cover the failure modes I anticipated. They cannot show how the system copes with the messiness of real ePCR exports.
 - **The simulated clinician approves everything it is shown.** I measured whether the gate is *needed*, not whether humans use it well. Automation bias (ASI09) needs a user study with clinicians.
 - **The deterministic policy drives the main table.** Using it isolates the effect of the server's controls, but it overstates agent competence. Table 2 is the honest measure of a real model, at one model size and temperature.
 - **Heuristic injection screen.** It is regex-based. It is a convenience for drafting; the structural gates are the defence.
 - **Exact-match patient matching.** It is conservative and will produce false blocks on legitimate data-entry variation. A production system would need a probabilistic matcher with human review.
+- **Unfixed failure mode.** The 7B model still sometimes stops after drafting despite two critic rejections (six cases), and on AMB-024 it exhausted its turn cap without naming the gap. Both are safe outcomes, but I did not fix them; a larger model or few-shot examples are the next step.
 
 The natural next steps are the HL7 Java validator, SMART scopes, a pre-arrival "update" flow that versions the case, and a usability study of the approval screen.
 
-## 9. Conclusion
+## 10. Conclusion
 
 I built and evaluated an MCP server and agent host that turn a synthetic ambulance record into a validated FHIR R4 handoff. A human clinician holds the only key that can send it. The ablation shows each layer's contribution. FHIR mapping and validation prevent lost or malformed facts. MCP gives two unrelated clients the same capabilities. Only server-side authority (scope, patient matching, approval bound to the exact draft, versioning and idempotency) prevents the wrong-patient, unapproved and duplicate handoffs that a compromised agent attempts. A real 7B model made the workflow genuinely agentic and exposed two failures the mock could not: stopping early and drifting to another case. A deterministic critic and a task-scope guard contained them. Across both, the system's safety did not depend on the model behaving well.
 
@@ -237,11 +254,16 @@ The deterministic evaluation of all 160 case-configuration runs completes in sec
 
 Versions of the server, mapping, profile, prompt, SDK and model, plus the commit, are stored beside every result. The dataset generator is seeded, and the source archive is pinned by hash. Thresholds that define "safe enough" are committed and enforced in CI. Changing them requires a visible commit.
 
-### A.9 Declaration of AI assistance
+## Appendix B. AI-use declaration
 
-In line with the module rule "declare AI assistance", parts of the implementation, tests, documentation and drafting of this report were produced with an AI coding assistant (Devin, by Cognition), working in my repository under my direction. Commits created with it carry a `Co-Authored-By` trailer. I reviewed the design, ran the system and the evaluations, and am responsible for the content and the claims in this report.
+| Tool | Used for | How I verified the output |
+|---|---|---|
+| Devin (Cognition), AI coding assistant | Scaffolding the server, host, evaluation harness and tests; drafting the README, threat model, slides and this report; generating synthetic cases | Ran the 151 tests and both evaluations myself; read and ran every demo command shown in the video; checked each NEMSIS element ID against the official v3.5.0 dictionary; checked every number in this report against `evals/results/` (the report is built from those files) |
+| Qwen2.5-7B-Instruct (local, Ollama) | The agent's language model in the real-LLM evaluation (Table 2) | It is the object of evaluation, not a source of content |
 
-## Appendix B. Reproduction
+Commits produced with the assistant carry a `Co-Authored-By` trailer. I made the design decisions, ran and recorded the system, and am responsible for every line and claim submitted.
+
+## Appendix C. Reproduction
 
 ```text
 git clone {{REPO_URL}} && cd cosc726-omairgibreel
