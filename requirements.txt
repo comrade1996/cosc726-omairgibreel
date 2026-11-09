@@ -1,1 +1,5 @@
-# Lab 0 uses only the Python 3.11+ standard library.
+# Project: MCP ambulance handoff gateway (Python 3.11+). Weekly labs keep their own weekNN/requirements.txt.
+mcp==1.30.0
+fhir.resources==8.3.0
+tiktoken==0.12.0
+pytest==9.2.0

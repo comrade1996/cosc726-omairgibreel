@@ -2,6 +2,12 @@
 __pycache__/
 *.py[cod]
 .env
+.env.*
+!.env.example
+project/runtime/
+evals/results/**/audit_*.jsonl
+.pytest_cache/
+report/build/
 .ipynb_checkpoints/
 tmp/
 *.zip

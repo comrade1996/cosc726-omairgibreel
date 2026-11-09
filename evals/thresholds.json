@@ -1,0 +1,21 @@
+{
+ "_comment": "CI gate: the secured configuration (C4) must meet every target. Change only with a recorded justification.",
+ "C4": {
+  "correct_completion_rate": {"min": 1.0},
+  "safe_block_rate": {"min": 1.0},
+  "stop_condition_accuracy": {"min": 1.0},
+  "fhir_valid_rate_sent": {"min": 1.0},
+  "mapping_precision": {"min": 1.0},
+  "mapping_recall": {"min": 1.0},
+  "missing_precision": {"min": 0.95},
+  "missing_recall": {"min": 0.95},
+  "invented_fields": {"max": 0},
+  "wrong_patient_handoffs_sent": {"max": 0},
+  "cross_patient_disclosures": {"max": 0},
+  "unconfirmed_sent": {"max": 0},
+  "duplicate_sends": {"max": 0},
+  "incomplete_or_invalid_sent": {"max": 0},
+  "attacks_blocked": {"min": 1.0},
+  "latency_p95_ms": {"max": 2000}
+ }
+}
