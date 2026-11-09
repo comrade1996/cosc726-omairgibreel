@@ -334,6 +334,70 @@ def build_pdf(items: list[dict], out: Path) -> None:
     page.unlink()
 
 
+CSS_AR = CSS + """
+body { direction: rtl; font-family: "Geeza Pro", "Arial", sans-serif; font-size: 13pt; line-height: 1.85; }
+h1, h2 { font-family: "Geeza Pro", Arial, sans-serif; }
+.cmd, code { direction: ltr; text-align: left; unicode-bidi: embed; }
+.box { border-left: none; border-right: 4px solid #1f4e79; }
+.say .act { font-family: "Geeza Pro", Arial, sans-serif; font-style: normal; font-size: 11.5pt; }
+"""
+
+
+def build_pdf_ar(items: list[dict], ar: list[tuple[str, str]], out: Path) -> None:
+    import re
+    from script_ar import AFTER_AR, SETUP_AR
+    cmd_box = lambda text: f"<div class='cmd'>{html.escape(text)}</div>"
+    setup = "".join(f"<li>{t}{cmd_box(SETUP) if i == 1 else ''}</li>" for i, t in enumerate(SETUP_AR))
+    parts = ["<h1>نص الشرح لفيديو العرض</h1><div>عمير جبريل - COSC726 - المدة المستهدفة 10:00 دقائق</div>",
+             f"<div class='box'><b>قبل أن تبدأ التسجيل</b><ol>{setup}</ol></div>"]
+    for n, (it, (title, say)) in enumerate(zip(items, ar), 1):
+        cmd = cmd_box("\n".join("$ " + c for c in it["cmd"].split("\n"))) if it.get("cmd") else ""
+        say = re.sub(r"\[(.+?)\]", r"<span class='act'>[\1]</span>", html.escape(say))
+        parts.append(f"<div class='block'><h2>الشريحة {n} - {html.escape(title)} &nbsp;<span class='time' dir='ltr'>{it['time']}</span></h2>"
+                     f"{cmd}<p class='say'>{say}</p></div>")
+    after = "".join(f"<li>{t}{cmd_box('python report/build_report.py --video-url \"https://youtu.be/YOUR_ID\"') if i == 2 else ''}</li>"
+                    for i, t in enumerate(AFTER_AR))
+    parts.append(f"<div class='box'><b>بعد التسجيل</b><ol>{after}</ol></div>")
+    page = out.with_suffix(".html")
+    page.write_text(f"<html lang='ar' dir='rtl'><head><meta charset='utf-8'><style>{CSS_AR}</style></head><body>{''.join(parts)}</body></html>")
+    subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-pdf-header-footer", f"--print-to-pdf={out}", page.as_uri()],
+                   check=True, capture_output=True)
+    page.unlink()
+
+
+def build_commands(items: list[dict], out: Path) -> None:
+    lines = ["COSC726 demo video - all commands, in recording order",
+             "Omair Gibreel - https://" + REPO, "=" * 70, "",
+             "# 0. ONE-TIME SETUP (only if the project is not installed yet)",
+             "git clone https://github.com/comrade1996/cosc726-omairgibreel.git",
+             "cd cosc726-omairgibreel",
+             "python3 -m venv .venv",
+             "source .venv/bin/activate",
+             "python -m pip install -r requirements.txt",
+             "python -m pytest -q tests                # should say: 151 passed", "",
+             "# 1. BEFORE RECORDING (every time you open a new Terminal)", SETUP, ""]
+    for n, it in enumerate(items, 1):
+        if it.get("cmd"):
+            lines.append(f"# Slide {n} - {it['title']}  ({it['time']})")
+            for c in it["cmd"].split("\n"):
+                lines += ["clear", c]
+            lines.append("")
+    lines += ["# OPTIONAL extras you can show if you have time",
+              "python -m project.agent.host --case AMB-035 --approve auto      # prompt-injection case, still sent safely",
+              "python -m project.agent.host --case AMB-029 --approve auto      # wrong patient (MRN) -> blocked",
+              "echo n | python -m project.agent.host --case AMB-001            # clinician declines -> NOT sent",
+              "cat evals/results/results.md                                    # results table",
+              "cat evals/results/llm/llm_results.md                            # real-LLM results", "",
+              "# AFTER UPLOADING THE VIDEO TO YOUTUBE (Unlisted)",
+              "python report/build_report.py --video-url \"https://youtu.be/YOUR_ID\"",
+              "#   -> rebuilds ../COSC726_Project_OmairGibreel_Report.pdf with the link on the title page",
+              "#   then edit README.md: replace VIDEO_URL_PLACEHOLDER with the link",
+              "git add README.md",
+              "git commit -m \"Add demo video link\"",
+              "git push", ""]
+    out.write_text("\n".join(lines))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out-dir", type=Path, default=ROOT.parent)
@@ -345,8 +409,17 @@ def main() -> None:
     pdf_path = args.out_dir / "COSC726_Demo_Script_OmairGibreel.pdf"
     build_pptx(items, pptx_path)
     build_pdf(items, pdf_path)
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from script_ar import slides_ar
+    ar = slides_ar(det, llm)
+    assert len(ar) == len(items)
+    ar_path = args.out_dir / "COSC726_Demo_Script_OmairGibreel_AR.pdf"
+    build_pdf_ar(items, ar, ar_path)
+    cmd_path = args.out_dir / "COSC726_Demo_Commands.txt"
+    build_commands(items, cmd_path)
     words = sum(len(i["say"].split()) for i in items)
-    print(f"Wrote {pptx_path}\nWrote {pdf_path}\n{len(items)} slides, {words} spoken words")
+    print(f"Wrote {pptx_path}\nWrote {pdf_path}\nWrote {ar_path}\nWrote {cmd_path}\n{len(items)} slides, {words} spoken words")
 
 
 if __name__ == "__main__":
