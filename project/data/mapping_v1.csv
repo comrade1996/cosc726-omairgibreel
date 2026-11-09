@@ -1,0 +1,38 @@
+nemsis_element,source_path,fhir_resource,fhir_path,transform,required_for_handoff
+eRecord.01,eRecord.01,Composition,identifier.value,copy,yes
+eResponse.01,eResponse.01,Organization (EMS agency),identifier.value,copy,yes
+eResponse.03,eResponse.03,Encounter,identifier.value,copy,no
+eResponse.13,eResponse.13,Encounter,serviceProvider.display suffix,copy,no
+eCrew.01,crew[].eCrew.01,Practitioner,identifier.value,copy,yes
+ePatient.02,patient.ePatient.02,Patient (matched),name.family,match against Synthea Patient; never overwrite,yes
+ePatient.03,patient.ePatient.03,Patient (matched),name.given[0],match against Synthea Patient; never overwrite,yes
+ePatient.17,patient.ePatient.17,Patient (matched),birthDate,match against Synthea Patient; never overwrite,yes
+ePatient.25,patient.ePatient.25,Patient (matched),gender,match against Synthea Patient; never overwrite,yes
+(MRN),patient.mrn,Patient (matched),identifier[type=MR].value,exact match required,yes
+eTimes.03,times.eTimes.03,Encounter,period.start,copy ISO-8601,yes
+eTimes.06,times.eTimes.06,Encounter,location[scene].period.start,copy ISO-8601,no
+eTimes.07,times.eTimes.07,Encounter,extension(arrived-at-patient),copy ISO-8601,yes
+eTimes.09,times.eTimes.09,Encounter,location[scene].period.end,copy ISO-8601,yes
+eTimes.11,times.eTimes.11,Encounter,period.end,copy ISO-8601,no
+eSituation.01,situation.eSituation.01,ClinicalImpression,effectiveDateTime,copy ISO-8601,no
+eSituation.09,situation.eSituation.09,ClinicalImpression,problem[0] (Condition contained),ICD-10-CM code copy,yes
+eSituation.11,situation.eSituation.11,ClinicalImpression,finding[0].itemCodeableConcept,ICD-10-CM code copy; status=in-progress (provisional),yes
+eVitals.01,vitals[].eVitals.01,Observation,effectiveDateTime,copy ISO-8601,yes
+eVitals.06,vitals[].eVitals.06,Observation (LOINC 85354-9),component[8480-6].valueQuantity,"value+UCUM unit copied, no conversion",yes
+eVitals.07,vitals[].eVitals.07,Observation (LOINC 85354-9),component[8462-4].valueQuantity,"value+UCUM unit copied, no conversion",no
+eVitals.10,vitals[].eVitals.10,Observation (LOINC 8867-4),valueQuantity,"value+UCUM unit copied, no conversion",yes
+eVitals.12,vitals[].eVitals.12,Observation (LOINC 59408-5),valueQuantity,"value+UCUM unit copied, no conversion",yes
+eVitals.14,vitals[].eVitals.14,Observation (LOINC 9279-1),valueQuantity,"value+UCUM unit copied, no conversion",yes
+eVitals.18,vitals[].eVitals.18,Observation (LOINC 2339-0),valueQuantity,"value+UCUM unit copied, no conversion",no
+eVitals.23,vitals[].eVitals.23,Observation (LOINC 9269-2),valueQuantity,"value+UCUM unit copied, no conversion",yes
+eVitals.24,vitals[].eVitals.24,Observation (LOINC 8310-5),valueQuantity,"value+UCUM unit copied, no conversion",no
+eVitals.27,vitals[].eVitals.27,Observation (LOINC 72514-3),valueQuantity,"value+UCUM unit copied, no conversion",no
+eProcedures.01,procedures[].eProcedures.01,Procedure,performedDateTime,copy ISO-8601,yes (or treatment_none)
+eProcedures.03,procedures[].eProcedures.03,Procedure,code (SNOMED CT),code copy; status=completed,yes (or treatment_none)
+eMedications.01,medications[].eMedications.01,MedicationAdministration,effectiveDateTime,copy ISO-8601,yes (or treatment_none)
+eMedications.03,medications[].eMedications.03,MedicationAdministration,medicationCodeableConcept (RxNorm),code copy; status=completed,yes (or treatment_none)
+eMedications.05,medications[].eMedications.05,MedicationAdministration,dosage.dose.value,copy (administered fact; never a recommendation),yes
+eMedications.06,medications[].eMedications.06,MedicationAdministration,dosage.dose.unit/code,UCUM copy,yes
+eDisposition.01,disposition.eDisposition.01,Organization (receiving ED),name,copy,yes
+eDisposition.02,disposition.eDisposition.02,Organization (receiving ED),identifier.value,copy,yes
+eNarrative.01,narrative.eNarrative.01,Composition,section[narrative].text,"untrusted; screened for instructions; withheld from draft if suspicious",no

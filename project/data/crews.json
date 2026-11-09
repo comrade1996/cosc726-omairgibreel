@@ -1,0 +1,89 @@
+{
+ "crews": {
+  "CREW-A": {
+   "tenant": "ems-north",
+   "unit": "MEDIC-11",
+   "members": [
+    "PM-A-1",
+    "EMT-A-2"
+   ],
+   "cases": [
+    "AMB-001",
+    "AMB-005",
+    "AMB-009",
+    "AMB-013",
+    "AMB-017",
+    "AMB-021",
+    "AMB-025",
+    "AMB-031",
+    "AMB-034",
+    "AMB-037",
+    "AMB-040"
+   ]
+  },
+  "CREW-B": {
+   "tenant": "ems-north",
+   "unit": "MEDIC-12",
+   "members": [
+    "PM-B-1",
+    "EMT-B-2"
+   ],
+   "cases": [
+    "AMB-002",
+    "AMB-006",
+    "AMB-010",
+    "AMB-014",
+    "AMB-018",
+    "AMB-022",
+    "AMB-026",
+    "AMB-029",
+    "AMB-032",
+    "AMB-035",
+    "AMB-038"
+   ]
+  },
+  "CREW-C": {
+   "tenant": "ems-north",
+   "unit": "MEDIC-13",
+   "members": [
+    "PM-C-1",
+    "EMT-C-2"
+   ],
+   "cases": [
+    "AMB-003",
+    "AMB-007",
+    "AMB-011",
+    "AMB-015",
+    "AMB-019",
+    "AMB-023",
+    "AMB-027",
+    "AMB-030",
+    "AMB-033",
+    "AMB-036",
+    "AMB-039"
+   ]
+  },
+  "CREW-D": {
+   "tenant": "ems-south",
+   "unit": "MEDIC-21",
+   "members": [
+    "PM-D-1",
+    "EMT-D-2"
+   ],
+   "cases": [
+    "AMB-004",
+    "AMB-008",
+    "AMB-012",
+    "AMB-016",
+    "AMB-020",
+    "AMB-024",
+    "AMB-028"
+   ]
+  }
+ },
+ "receiving_organizations": {
+  "ORG-ED-01": "Synthetic General Hospital Emergency Department",
+  "ORG-ED-02": "Synthetic University Hospital Emergency Department",
+  "ORG-ED-03": "Synthetic Community Hospital Emergency Department"
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "entry": [
+  {
+   "resource": {
+    "birthDate": "2006-10-16",
+    "gender": "female",
+    "id": "69bb7f3e-31ab-fee6-9ab6-4a83c24df020",
+    "identifier": [
+     {
+      "system": "http://hospital.smarthealthit.org",
+      "type": {
+       "coding": [
+        {
+         "code": "MR",
+         "display": "Medical Record Number",
+         "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+        }
+       ],
+       "text": "Medical Record Number"
+      },
+      "value": "69bb7f3e-31ab-fee6-9ab6-4a83c24df020"
+     }
+    ],
+    "name": [
+     {
+      "family": "Lemus978",
+      "given": [
+       "Emilia403"
+      ],
+      "use": "official"
+     }
+    ],
+    "resourceType": "Patient"
+   }
+  }
+ ],
+ "resourceType": "Bundle",
+ "type": "collection"
+}

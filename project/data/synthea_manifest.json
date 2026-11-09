@@ -1,0 +1,89 @@
+{
+ "source_url": "https://synthetichealth.github.io/synthea-sample-data/downloads/synthea_sample_data_fhir_r4_nov2021.zip",
+ "source_sha256": "6d3c5433bcae4791bc5c30469d1445b430fb4894d5c13bda15fee0584bbd7778",
+ "selection_rule": "alive, age 18-90 on 2026-01-01, ordered by sha256(patient.id), first 20",
+ "minimisation": "Patient(MR identifier, name, gender, birthDate); <=5 active disorders; active allergies",
+ "eligible_patients": 410,
+ "patients": [
+  {
+   "id": "d321aaa9-5b61-14ae-832b-46b4b50fd88e",
+   "source_file": "fhir/Lynetta635_Hahn503_d321aaa9-5b61-14ae-832b-46b4b50fd88e.json"
+  },
+  {
+   "id": "e4c2980e-ffa5-4570-988e-3eb8e108aad3",
+   "source_file": "fhir/Ethan766_Smitham825_e4c2980e-ffa5-4570-988e-3eb8e108aad3.json"
+  },
+  {
+   "id": "ba9773bf-d2ba-899b-a68c-4ef986c1325e",
+   "source_file": "fhir/Birgit199_Maggio310_ba9773bf-d2ba-899b-a68c-4ef986c1325e.json"
+  },
+  {
+   "id": "23436e20-0eca-9c61-472c-6f03ec5bef26",
+   "source_file": "fhir/Chris95_Gislason620_23436e20-0eca-9c61-472c-6f03ec5bef26.json"
+  },
+  {
+   "id": "747405cb-2f91-e54a-c123-55f4e9edfc4c",
+   "source_file": "fhir/Troy560_Jerde200_747405cb-2f91-e54a-c123-55f4e9edfc4c.json"
+  },
+  {
+   "id": "83f922a9-3567-cb65-b57f-2da9cc05af15",
+   "source_file": "fhir/Sofia418_Mesa630_83f922a9-3567-cb65-b57f-2da9cc05af15.json"
+  },
+  {
+   "id": "c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d",
+   "source_file": "fhir/Young120_Orn563_c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d.json"
+  },
+  {
+   "id": "add236d5-0131-8a3f-8b55-a081df83922e",
+   "source_file": "fhir/Darline247_Ondricka197_add236d5-0131-8a3f-8b55-a081df83922e.json"
+  },
+  {
+   "id": "0f444cf3-eb58-6f42-c740-a6ab70cec7ee",
+   "source_file": "fhir/Genny123_Rath779_0f444cf3-eb58-6f42-c740-a6ab70cec7ee.json"
+  },
+  {
+   "id": "41ba25b8-f5ca-3bce-c26f-64b5ce13e525",
+   "source_file": "fhir/Lucius907_Gerlach374_41ba25b8-f5ca-3bce-c26f-64b5ce13e525.json"
+  },
+  {
+   "id": "918e387f-cb9a-ec9f-ab54-65467a4df548",
+   "source_file": "fhir/Frederick289_Conroy74_918e387f-cb9a-ec9f-ab54-65467a4df548.json"
+  },
+  {
+   "id": "eb16b994-f2ca-beee-fce4-25286f1a0e89",
+   "source_file": "fhir/Julieta402_Schmitt836_eb16b994-f2ca-beee-fce4-25286f1a0e89.json"
+  },
+  {
+   "id": "57e403fc-885a-3b44-804e-a034ca08413c",
+   "source_file": "fhir/Marc757_Rutherford999_57e403fc-885a-3b44-804e-a034ca08413c.json"
+  },
+  {
+   "id": "69bb7f3e-31ab-fee6-9ab6-4a83c24df020",
+   "source_file": "fhir/Emilia403_Lemus978_69bb7f3e-31ab-fee6-9ab6-4a83c24df020.json"
+  },
+  {
+   "id": "e266fa7d-d981-ef94-45e7-3d253425c3f9",
+   "source_file": "fhir/Yong583_Rodriguez71_e266fa7d-d981-ef94-45e7-3d253425c3f9.json"
+  },
+  {
+   "id": "9d92805b-c25a-c7ad-60ca-80c93ffb80b1",
+   "source_file": "fhir/Frances376_Smitham825_9d92805b-c25a-c7ad-60ca-80c93ffb80b1.json"
+  },
+  {
+   "id": "454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9",
+   "source_file": "fhir/Kizzy275_Daniel959_454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9.json"
+  },
+  {
+   "id": "162135b4-931d-a531-c2ad-047b0c24abe8",
+   "source_file": "fhir/Genna99_Stehr398_162135b4-931d-a531-c2ad-047b0c24abe8.json"
+  },
+  {
+   "id": "d477c46c-6e56-e32f-0c28-7356caab1e8b",
+   "source_file": "fhir/Leif534_Abbott774_d477c46c-6e56-e32f-0c28-7356caab1e8b.json"
+  },
+  {
+   "id": "436a7fef-6640-96ab-2557-77e40e947bc9",
+   "source_file": "fhir/Arline53_Rohan584_436a7fef-6640-96ab-2557-77e40e947bc9.json"
+  }
+ ]
+}

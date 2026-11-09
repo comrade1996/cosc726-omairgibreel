@@ -1,0 +1,347 @@
+{
+ "entry": [
+  {
+   "resource": {
+    "birthDate": "1967-01-30",
+    "gender": "male",
+    "id": "c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d",
+    "identifier": [
+     {
+      "system": "http://hospital.smarthealthit.org",
+      "type": {
+       "coding": [
+        {
+         "code": "MR",
+         "display": "Medical Record Number",
+         "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+        }
+       ],
+       "text": "Medical Record Number"
+      },
+      "value": "c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+     }
+    ],
+    "name": [
+     {
+      "family": "Orn563",
+      "given": [
+       "Young120"
+      ],
+      "use": "official"
+     }
+    ],
+    "resourceType": "Patient"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "271737000",
+       "display": "Anemia (disorder)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Anemia (disorder)"
+    },
+    "id": "cb623122-ffce-65cf-85a9-53c5b91695b4",
+    "onsetDateTime": "2009-02-09T18:28:07-05:00",
+    "resourceType": "Condition",
+    "subject": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    }
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "40055000",
+       "display": "Chronic sinusitis (disorder)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Chronic sinusitis (disorder)"
+    },
+    "id": "9e8ee9fd-914b-38dd-00e6-50d0633b0a28",
+    "onsetDateTime": "2012-12-19T22:28:07-05:00",
+    "resourceType": "Condition",
+    "subject": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    }
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "111088007",
+       "display": "Latex (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Latex (substance)"
+    },
+    "criticality": "low",
+    "id": "89870bbb-221b-e2dd-c856-a8f84880c74e",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "84489001",
+       "display": "Mold (organism)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Mold (organism)"
+    },
+    "criticality": "low",
+    "id": "fe5de776-b736-d4a8-bc88-e60facc458c3",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "260147004",
+       "display": "House dust mite (organism)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "House dust mite (organism)"
+    },
+    "criticality": "low",
+    "id": "1b933564-262f-60c1-c9fd-4352568bc1b3",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "264287008",
+       "display": "Animal dander (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Animal dander (substance)"
+    },
+    "criticality": "low",
+    "id": "b3e46430-1adf-4ba6-3956-739091e4fecc",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "256277009",
+       "display": "Grass pollen (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Grass pollen (substance)"
+    },
+    "criticality": "low",
+    "id": "16a29cc9-f23d-93d6-cd6c-fbaa1596e3c2",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "3718001",
+       "display": "Cow's milk (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Cow's milk (substance)"
+    },
+    "criticality": "low",
+    "id": "5d7e7ffd-f1af-88a5-0ec8-62c87dc7c03e",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "102263004",
+       "display": "Eggs (edible) (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Eggs (edible) (substance)"
+    },
+    "criticality": "low",
+    "id": "069f9a61-8353-fa50-2f44-a2e20e34e015",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "412071004",
+       "display": "Wheat (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Wheat (substance)"
+    },
+    "criticality": "low",
+    "id": "cb64b274-ad48-d750-3f7f-9d8865655abd",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "735029006",
+       "display": "Shellfish (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Shellfish (substance)"
+    },
+    "criticality": "low",
+    "id": "6a585503-e91c-caf2-8722-98ded1f5e5fc",
+    "patient": {
+     "reference": "Patient/c0b0f482-c7b7-c9dd-9f8d-66f8dc6b4f4d"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  }
+ ],
+ "resourceType": "Bundle",
+ "type": "collection"
+}

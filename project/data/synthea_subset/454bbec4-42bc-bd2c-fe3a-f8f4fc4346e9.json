@@ -1,0 +1,375 @@
+{
+ "entry": [
+  {
+   "resource": {
+    "birthDate": "2001-09-17",
+    "gender": "female",
+    "id": "454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9",
+    "identifier": [
+     {
+      "system": "http://hospital.smarthealthit.org",
+      "type": {
+       "coding": [
+        {
+         "code": "MR",
+         "display": "Medical Record Number",
+         "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+        }
+       ],
+       "text": "Medical Record Number"
+      },
+      "value": "454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+     }
+    ],
+    "name": [
+     {
+      "family": "Daniel959",
+      "given": [
+       "Kizzy275"
+      ],
+      "use": "official"
+     }
+    ],
+    "resourceType": "Patient"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "271737000",
+       "display": "Anemia (disorder)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Anemia (disorder)"
+    },
+    "id": "6bef058b-ab11-7ae8-ce77-97a442cd5fda",
+    "onsetDateTime": "2021-05-31T21:45:55-04:00",
+    "resourceType": "Condition",
+    "subject": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    }
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "111088007",
+       "display": "Latex (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Latex (substance)"
+    },
+    "criticality": "low",
+    "id": "f2bdf9d3-d1ec-ccb0-35a4-33dce23dac95",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "288328004",
+       "display": "Bee venom (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Bee venom (substance)"
+    },
+    "criticality": "low",
+    "id": "e53ff8f8-bdc1-ae30-2a10-9376db063162",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "84489001",
+       "display": "Mold (organism)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Mold (organism)"
+    },
+    "criticality": "low",
+    "id": "f1f0fe26-817b-f35d-2ffa-24385229c434",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "260147004",
+       "display": "House dust mite (organism)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "House dust mite (organism)"
+    },
+    "criticality": "low",
+    "id": "62c9c5c7-865c-61be-1edf-d3101d8047a6",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "264287008",
+       "display": "Animal dander (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Animal dander (substance)"
+    },
+    "criticality": "low",
+    "id": "34346645-b8a4-7d9f-f09a-64b83f1b6817",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "256277009",
+       "display": "Grass pollen (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Grass pollen (substance)"
+    },
+    "criticality": "low",
+    "id": "b3fa49aa-5c63-2ce0-2a38-41f64b11ac9e",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "782576004",
+       "display": "Tree pollen (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Tree pollen (substance)"
+    },
+    "criticality": "low",
+    "id": "82e59d85-a7e8-3308-1b13-441edb35233a",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "3718001",
+       "display": "Cow's milk (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Cow's milk (substance)"
+    },
+    "criticality": "low",
+    "id": "d02f5d15-7fea-daa0-a6d8-45dccd0c1c4d",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "256355007",
+       "display": "Soya bean (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Soya bean (substance)"
+    },
+    "criticality": "low",
+    "id": "9bc159a0-7561-5fbe-7c70-7c31d0d5a94b",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "412071004",
+       "display": "Wheat (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Wheat (substance)"
+    },
+    "criticality": "low",
+    "id": "8ae5e521-aecb-efdf-7c38-dbbc06cad2ae",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  },
+  {
+   "resource": {
+    "clinicalStatus": {
+     "coding": [
+      {
+       "code": "active",
+       "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+      }
+     ]
+    },
+    "code": {
+     "coding": [
+      {
+       "code": "442571000124108",
+       "display": "Tree nut (substance)",
+       "system": "http://snomed.info/sct"
+      }
+     ],
+     "text": "Tree nut (substance)"
+    },
+    "criticality": "low",
+    "id": "c875032e-bf8f-52fa-13f4-0e3a5568b92d",
+    "patient": {
+     "reference": "Patient/454bbec4-42bc-bd2c-fe3a-f8f4fc4346e9"
+    },
+    "resourceType": "AllergyIntolerance"
+   }
+  }
+ ],
+ "resourceType": "Bundle",
+ "type": "collection"
+}
