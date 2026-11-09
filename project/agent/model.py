@@ -100,11 +100,12 @@ class MockModel:
                       text=self._summary(case_id, draft, result))
 
     def _summary(self, case_id: str, draft: dict, result: dict) -> str:
-        keep = [l for l in draft["lines"] if l["section"] in ("Patient", "M - Mechanism/illness", "I - Information/impression",
-                                                                  "S - Signs", "T - Treatment")]
-        signs = [l for l in keep if l["section"] == "S - Signs"]
-        keep = [l for l in keep if l["section"] != "S - Signs"] + signs[-1:]
-        body = "\n".join(f"{l['section'].split(' - ')[0]}: {l['text']}" for l in keep[:6])
+        order = ("Patient", "M - Mechanism/illness", "I - Information/impression", "S - Signs", "T - Treatment")
+        keep = []
+        for section in order:
+            rows = [l for l in draft["lines"] if l["section"] == section]
+            keep += rows[-1:] if section == "S - Signs" else rows  # latest vital-sign set only
+        body = "\n".join(f"{l['section'].split(' - ')[0]}: {l['text']}" for l in keep)
         return f"Handoff {case_id} sent as {result['handoff_id']}.\n{body}"
 
 
