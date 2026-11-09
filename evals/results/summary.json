@@ -1,0 +1,177 @@
+{
+ "meta": {
+  "generated_at": "2026-11-09T08:48:06+00:00",
+  "git_commit": "14c35e5",
+  "cases": 40,
+  "agent_model": "mock-policy-v1",
+  "tokenizer": "tiktoken cl100k_base",
+  "python": "3.12.16",
+  "versions": {
+   "server": "1.0.0",
+   "mapping": "1.0",
+   "profile": "1.0.0",
+   "prompt": "1.0",
+   "fhir": "R4 4.0.1",
+   "mcp_sdk": "1.30.0",
+   "fhir.resources": "8.3.0",
+   "transport": "stdio (C3/C4), Streamable HTTP (discovery check)",
+   "case_set": "project/data/cases.jsonl"
+  }
+ },
+ "summary": {
+  "C1": {
+   "description": "custom JSON, direct Python",
+   "cases": 40,
+   "correct_completion_rate": 1.0,
+   "safe_block_rate": 0.25,
+   "stop_condition_accuracy": 0.7,
+   "fhir_valid_rate_sent": null,
+   "structure_errors": 0,
+   "mapping_precision": null,
+   "mapping_recall": null,
+   "missing_precision": 1.0,
+   "missing_recall": 0.533,
+   "invented_fields": 1,
+   "wrong_patient_handoffs_sent": 2,
+   "cross_patient_disclosures": 3,
+   "unconfirmed_sent": 2,
+   "duplicate_sends": 4,
+   "incomplete_or_invalid_sent": 12,
+   "attacks_blocked": "0/7",
+   "latency_p50_ms": 0.53,
+   "latency_p95_ms": 0.65,
+   "context_tokens_mean": null,
+   "payload_tokens_mean": 2041,
+   "schema_tokens": 0
+  },
+  "C2": {
+   "description": "FHIR, direct Python, gates off",
+   "cases": 40,
+   "correct_completion_rate": 1.0,
+   "safe_block_rate": 0.875,
+   "stop_condition_accuracy": 0.95,
+   "fhir_valid_rate_sent": 1.0,
+   "structure_errors": 0,
+   "mapping_precision": 1.0,
+   "mapping_recall": 1.0,
+   "missing_precision": 1.0,
+   "missing_recall": 1.0,
+   "invented_fields": 0,
+   "wrong_patient_handoffs_sent": 2,
+   "cross_patient_disclosures": 2,
+   "unconfirmed_sent": 2,
+   "duplicate_sends": 4,
+   "incomplete_or_invalid_sent": 2,
+   "attacks_blocked": "2/7",
+   "latency_p50_ms": 6.68,
+   "latency_p95_ms": 11.14,
+   "context_tokens_mean": 15493,
+   "payload_tokens_mean": 2359,
+   "schema_tokens": 849
+  },
+  "C3": {
+   "description": "MCP + FHIR, gates off",
+   "cases": 40,
+   "correct_completion_rate": 1.0,
+   "safe_block_rate": 0.875,
+   "stop_condition_accuracy": 0.95,
+   "fhir_valid_rate_sent": 1.0,
+   "structure_errors": 0,
+   "mapping_precision": 1.0,
+   "mapping_recall": 1.0,
+   "missing_precision": 1.0,
+   "missing_recall": 1.0,
+   "invented_fields": 0,
+   "wrong_patient_handoffs_sent": 2,
+   "cross_patient_disclosures": 2,
+   "unconfirmed_sent": 2,
+   "duplicate_sends": 4,
+   "incomplete_or_invalid_sent": 2,
+   "attacks_blocked": "2/7",
+   "latency_p50_ms": 10.59,
+   "latency_p95_ms": 15.14,
+   "context_tokens_mean": 17395,
+   "payload_tokens_mean": 2685,
+   "schema_tokens": 849
+  },
+  "C4": {
+   "description": "secured MCP + FHIR (all gates)",
+   "cases": 40,
+   "correct_completion_rate": 1.0,
+   "safe_block_rate": 1.0,
+   "stop_condition_accuracy": 1.0,
+   "fhir_valid_rate_sent": 1.0,
+   "structure_errors": 0,
+   "mapping_precision": 1.0,
+   "mapping_recall": 1.0,
+   "missing_precision": 1.0,
+   "missing_recall": 1.0,
+   "invented_fields": 0,
+   "wrong_patient_handoffs_sent": 0,
+   "cross_patient_disclosures": 0,
+   "unconfirmed_sent": 0,
+   "duplicate_sends": 0,
+   "incomplete_or_invalid_sent": 0,
+   "attacks_blocked": "7/7",
+   "latency_p50_ms": 10.58,
+   "latency_p95_ms": 66.32,
+   "context_tokens_mean": 17079,
+   "payload_tokens_mean": 2681,
+   "schema_tokens": 849
+  }
+ },
+ "discovery": {
+  "stdio_agent_host": {
+   "tools": [
+    "check_handoff_completeness",
+    "confirm_handoff",
+    "create_handoff_draft",
+    "get_ambulance_case",
+    "list_assigned_cases",
+    "record_ed_acknowledgement",
+    "validate_fhir_bundle"
+   ],
+   "resources": [
+    "ambulance://cases/{case_id}/audit",
+    "ambulance://cases/{case_id}/fhir",
+    "ambulance://cases/{case_id}/source",
+    "ambulance://cases/{case_id}/validation",
+    "ambulance://profiles/handoff-r4"
+   ],
+   "prompts": [
+    "explain_validation_failure",
+    "prepare_mist_handoff",
+    "prepare_sbar_handoff"
+   ]
+  },
+  "http_scripted_client": {
+   "tools": [
+    "check_handoff_completeness",
+    "confirm_handoff",
+    "create_handoff_draft",
+    "get_ambulance_case",
+    "list_assigned_cases",
+    "record_ed_acknowledgement",
+    "validate_fhir_bundle"
+   ],
+   "resources": [
+    "ambulance://cases/{case_id}/audit",
+    "ambulance://cases/{case_id}/fhir",
+    "ambulance://cases/{case_id}/source",
+    "ambulance://cases/{case_id}/validation",
+    "ambulance://profiles/handoff-r4"
+   ],
+   "prompts": [
+    "explain_validation_failure",
+    "prepare_mist_handoff",
+    "prepare_sbar_handoff"
+   ]
+  },
+  "identical": true,
+  "http_security_probe": {
+   "no_token": 401,
+   "forged_token": 401,
+   "foreign_origin": 403
+  }
+ }
+}
