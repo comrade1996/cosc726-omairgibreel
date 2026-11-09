@@ -11,8 +11,7 @@ title: "MCP Ambulance Handoff Gateway: an agentic, human-gated HL7 FHIR R4 hando
 <tr><td>Student</td><td>Omair Gibreel - student number 0</td></tr>
 <tr><td>Repository</td><td><a href="{{REPO_URL}}">{{REPO_URL}}</a></td></tr>
 <tr><td>Demo video (unlisted)</td><td><a href="{{VIDEO_URL}}">{{VIDEO_URL}}</a></td></tr>
-<tr><td>Release evaluated</td><td>commit <code>{{META.git_commit}}</code>, evaluation run {{META.generated_at}}</td></tr>
-<tr><td>Word count</td><td>{{WORDS}} words (main body, excluding title page, tables, references and appendices)</td></tr>
+<tr><td>Word count</td><td>{{WORDS}} words</td></tr>
 <tr><td>Domain</td><td>Health (synthetic data only)</td></tr>
 <tr><td>Date</td><td>{{DATE}}</td></tr>
 </table>
